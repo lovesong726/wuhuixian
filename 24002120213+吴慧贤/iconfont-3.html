@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>移动导航 · 字体图标版（iconfont）</title>
+  <meta name="description" content="移动端固定底部导航标本：四个项目等分自适应宽度，字体图标渲染，含数字徽章与红点。" />
+  <!-- 本地 iconfont 项目字体：字体图标方式 -->
+  <link rel="stylesheet" href="font/iconfont.css" />
+  <style>
+    :root {
+      --whx-paper: #f3f1ec;
+      --whx-ink: #211e1b;
+      --whx-muted: #6f6a62;
+      --whx-blue: #0e63b6;
+      --whx-tint: var(--whx-blue);
+      --whx-red: #e64530;
+      --whx-serif: "Noto Serif SC", "Source Han Serif SC", "STZhongsong", SimSun, serif;
+      --whx-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      --whx-mono: Consolas, "Courier New", monospace;
+      --whx-bar-h: 64px;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      background: #e7e4dd; /* 手机框外更暗一层 */
+      color: var(--whx-ink);
+      font-family: var(--whx-sans);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    a { color: inherit; }
+
+    /* ---------- 手机框 ---------- */
+    .whx-stage {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--whx-paper);
+    }
+
+    @media (min-width: 520px) {
+      .whx-stage { border-left: 1px solid var(--whx-ink); border-right: 1px solid var(--whx-ink); }
+    }
+
+    /* ---------- 应用顶栏 ---------- */
+    .whx-appbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--whx-paper);
+      border-bottom: 2px solid var(--whx-ink);
+    }
+
+    .whx-brand {
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: 17px;
+      text-decoration: none;
+    }
+
+    .whx-brand em { font-style: normal; color: var(--whx-tint); }
+
+    .whx-sibling { font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
+    .whx-sibling:hover { color: var(--whx-tint); }
+    .whx-sibling:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 3px; }
+
+    /* ---------- 内容 ---------- */
+    .whx-main { padding: 26px 18px calc(var(--whx-bar-h) + 44px + env(safe-area-inset-bottom, 0px)); }
+
+    .whx-kicker { margin: 0 0 8px; font-size: 13px; color: var(--whx-muted); }
+
+    .whx-title {
+      margin: 0;
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+    }
+
+    .whx-lead { margin: 14px 0 0; color: var(--whx-muted); }
+    .whx-lead strong { color: var(--whx-tint); font-weight: 600; }
+
+    .whx-code {
+      margin: 20px 0 0;
+      padding: 16px 18px;
+      background: var(--whx-ink);
+      color: var(--whx-paper);
+      font-family: var(--whx-mono);
+      font-size: 12.5px;
+      line-height: 1.9;
+      overflow-x: auto;
+    }
+
+    .whx-code .whx-cm { color: #9b948a; }
+    .whx-code .whx-tag { color: #8fc4ee; }
+
+    .whx-linklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--whx-ink);
+    }
+
+    .whx-linklist a {
+      width: fit-content;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      font-size: 14px;
+    }
+
+    .whx-linklist a:hover { color: var(--whx-tint); }
+    .whx-linklist a:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 3px; }
+
+    /* ---------- 底部导航（固定 · 自适应等分宽度） ---------- */
+    .whx-tabbar {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      background: var(--whx-paper);
+      border-top: 2px solid var(--whx-ink);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      z-index: 20;
+    }
+
+    .whx-tab {
+      position: relative;
+      flex: 1 1 0; /* 四项等分，宽度随屏幕自适应 */
+      min-width: 0;
+      height: var(--whx-bar-h);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: 0;
+      padding: 0;
+      font-family: inherit;
+      color: var(--whx-muted);
+      cursor: pointer;
+    }
+
+    .whx-tab::before {
+      content: "";
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      width: 30px;
+      height: 3px;
+      background: var(--whx-tint);
+      transform: translateX(-50%) scaleX(0);
+      transition: transform 0.2s ease;
+    }
+
+    .whx-tab:hover { color: var(--whx-ink); }
+    .whx-tab:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: -4px; }
+
+    .whx-tab.whx-active { color: var(--whx-tint); }
+    .whx-tab.whx-active::before { transform: translateX(-50%) scaleX(1); }
+    .whx-tab.whx-active .whx-label { font-weight: 700; }
+
+    .whx-ico { position: relative; display: block; }
+
+    .whx-ico .iconfont {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .whx-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---------- 徽章与红点 ---------- */
+    .whx-badge {
+      position: absolute;
+      top: -7px;
+      left: calc(50% + 4px);
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: var(--whx-red);
+      border: 2px solid var(--whx-paper);
+      color: #fff;
+      font-family: var(--whx-mono);
+      font-size: 10px;
+      font-style: normal;
+      line-height: 12px;
+      text-align: center;
+    }
+
+    .whx-dot {
+      position: absolute;
+      top: -3px;
+      left: calc(50% + 8px);
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--whx-red);
+      border: 2px solid var(--whx-paper);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="whx-stage">
+    <header class="whx-appbar">
+      <a class="whx-brand" href="index.html">墨与线<em> · </em>移动导航</a>
+      <a class="whx-sibling" href="iconfont-4.html">SVG 版</a>
+    </header>
+
+    <main class="whx-main">
+      <section class="whx-panel" data-whx-panel="home" role="tabpanel">
+        <p class="whx-kicker">字体图标版 · iconfont webfont</p>
+        <h1 class="whx-title">地板上的四个字标</h1>
+        <p class="whx-lead">
+          底部导航<strong>固定在视口底缘</strong>，四个项目等分宽度，随屏幕伸缩。
+          右上角的<strong>数字徽章</strong>与<strong>红点</strong>负责把未读的事带到眼前：
+          进购物车，徽章清零；进收藏，红点熄灭。
+        </p>
+        <pre class="whx-code"><code><span class="whx-cm">&lt;!-- 引入项目字体图标样式 --&gt;</span>
+<span class="whx-tag">&lt;link</span> <span class="whx-attr">rel</span>=<span class="whx-cm">"stylesheet"</span> <span class="whx-attr">href</span>=<span class="whx-cm">"font/iconfont.css"</span><span class="whx-tag">&gt;</span>
+
+<span class="whx-cm">&lt;!-- 底部导航的四个字标 --&gt;</span>
+<span class="whx-tag">&lt;span</span> <span class="whx-attr">class</span>=<span class="whx-cm">"iconfont icon-shouye"</span><span class="whx-tag">&gt;&lt;/span&gt;</span>
+<span class="whx-tag">&lt;span</span> <span class="whx-attr">class</span>=<span class="whx-cm">"iconfont icon-shoucang"</span><span class="whx-tag">&gt;&lt;/span&gt;</span>
+<span class="whx-tag">&lt;span</span> <span class="whx-attr">class</span>=<span class="whx-cm">"iconfont icon-gouwuche"</span><span class="whx-tag">&gt;&lt;/span&gt;</span>
+<span class="whx-tag">&lt;span</span> <span class="whx-attr">class</span>=<span class="whx-cm">"iconfont icon-wode"</span><span class="whx-tag">&gt;&lt;/span&gt;</span></code></pre>
+        <div class="whx-linklist">
+          <a href="index.html">返回标本室首页</a>
+          <a href="iconfont-4.html">看另一版：SVG 图标导航</a>
+        </div>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="fav" role="tabpanel" hidden>
+        <p class="whx-kicker">收藏</p>
+        <h1 class="whx-title">红点熄灭了</h1>
+        <p class="whx-lead">
+          红点表示有新东西待看。你已经进来了，红点随之熄灭，
+          下次有新收藏时它会再亮起。
+        </p>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="cart" role="tabpanel" hidden>
+        <p class="whx-kicker">购物车</p>
+        <h1 class="whx-title">徽章归零</h1>
+        <p class="whx-lead">
+          刚才徽章上写着 3，是三件待结算的商品。现在你看过了，数字清零，
+          导航上的提示随之消失。
+        </p>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="mine" role="tabpanel" hidden>
+        <p class="whx-kicker">我的</p>
+        <h1 class="whx-title">个人页示意</h1>
+        <p class="whx-lead">
+          24002120213 吴慧贤，《高级网页设计》课堂实践。
+          这一页用字体图标完成：字形来自 iconfont 字体文件，随文本一起渲染。
+        </p>
+      </section>
+    </main>
+
+    <nav class="whx-tabbar" role="tablist" aria-label="底部导航">
+      <button class="whx-tab whx-active" type="button" role="tab" aria-selected="true" data-whx-tab="home">
+        <span class="whx-ico"><span class="iconfont icon-shouye" aria-hidden="true"></span></span>
+        <span class="whx-label">首页</span>
+      </button>
+      <button class="whx-tab" type="button" role="tab" aria-selected="false" data-whx-tab="fav">
+        <span class="whx-ico">
+          <span class="iconfont icon-shoucang" aria-hidden="true"></span>
+          <i class="whx-dot" id="whx-dot-fav" aria-hidden="true"></i>
+        </span>
+        <span class="whx-label">收藏</span>
+      </button>
+      <button class="whx-tab" type="button" role="tab" aria-selected="false" data-whx-tab="cart">
+        <span class="whx-ico">
+          <span class="iconfont icon-gouwuche" aria-hidden="true"></span>
+          <i class="whx-badge" id="whx-badge-cart" aria-label="3 件待结算">3</i>
+        </span>
+        <span class="whx-label">购物车</span>
+      </button>
+      <button class="whx-tab" type="button" role="tab" aria-selected="false" data-whx-tab="mine">
+        <span class="whx-ico"><span class="iconfont icon-wode" aria-hidden="true"></span></span>
+        <span class="whx-label">我的</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var whxTabs = document.querySelectorAll('.whx-tab');
+      var whxPanels = document.querySelectorAll('.whx-panel');
+      var whxCartBadge = document.getElementById('whx-badge-cart');
+      var whxFavDot = document.getElementById('whx-dot-fav');
+
+      // 切换页签：更新选中态与面板；进购物车清徽章，进收藏熄红点
+      function whxActivate(key) {
+        whxTabs.forEach(function (t) {
+          var on = t.dataset.whxTab === key;
+          t.classList.toggle('whx-active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        whxPanels.forEach(function (p) {
+          p.hidden = p.dataset.whxPanel !== key;
+        });
+        if (key === 'cart' && whxCartBadge) whxCartBadge.hidden = true;
+        if (key === 'fav' && whxFavDot) whxFavDot.hidden = true;
+      }
+
+      whxTabs.forEach(function (t) {
+        t.addEventListener('click', function () {
+          whxActivate(t.dataset.whxTab);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

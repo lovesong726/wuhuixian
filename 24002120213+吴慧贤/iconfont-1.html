@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>铸字 · Font Awesome 字体图标标本</title>
+  <meta name="description" content="以字盘形式陈列 Font Awesome 字体图标，可调字号与墨色，点击复制标签。" />
+  <!-- 本地 Font Awesome：字体图标方式（CSS + webfonts） -->
+  <link rel="stylesheet" href="cdn/css/all.min.css" />
+  <style>
+    :root {
+      --whx-paper: #f3f1ec;
+      --whx-ink: #211e1b;
+      --whx-muted: #6f6a62;
+      --whx-blue: #0e63b6;
+      --whx-pink: #e84a9c;
+      --whx-tint: var(--whx-blue);
+      --whx-size: 40px;
+      --whx-serif: "Noto Serif SC", "Source Han Serif SC", "STZhongsong", SimSun, serif;
+      --whx-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      --whx-mono: Consolas, "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--whx-paper);
+      color: var(--whx-ink);
+      font-family: var(--whx-sans);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    a { color: inherit; }
+
+    /* ---------- 顶栏 ---------- */
+    .whx-topbar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 28px;
+      border-bottom: 2px solid var(--whx-ink);
+    }
+
+    .whx-brand {
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: 19px;
+      text-decoration: none;
+    }
+
+    .whx-brand em { font-style: normal; color: var(--whx-tint); }
+
+    .whx-nav { display: flex; gap: 22px; font-size: 14px; }
+
+    .whx-nav a { text-decoration: none; border-bottom: 1px solid transparent; }
+    .whx-nav a:hover { border-bottom-color: var(--whx-tint); }
+    .whx-nav a:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 3px; }
+
+    .whx-nav .whx-here { border-bottom: 2px solid var(--whx-tint); }
+
+    /* ---------- 头版 ---------- */
+    .whx-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: stretch;
+      gap: 32px;
+      padding: 40px 28px 48px;
+      border-bottom: 2px solid var(--whx-ink);
+    }
+
+    .whx-hero-kicker { margin: 0 0 10px; font-size: 14px; color: var(--whx-muted); }
+
+    .whx-hero-title {
+      margin: 0;
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: clamp(64px, 10vw, 118px);
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+    }
+
+    .whx-hero-title small {
+      display: block;
+      font-size: clamp(18px, 2.4vw, 26px);
+      font-weight: 400;
+      color: var(--whx-muted);
+      margin-top: 12px;
+      letter-spacing: 0.12em;
+    }
+
+    .whx-hero-lead {
+      max-width: 34em;
+      margin: 22px 0 0;
+      color: var(--whx-muted);
+    }
+
+    .whx-hero-lead strong { color: var(--whx-tint); font-weight: 600; }
+
+    .whx-hero-glyph {
+      align-self: center;
+      justify-self: end;
+      font-size: clamp(150px, 22vw, 300px);
+      line-height: 1;
+      color: var(--whx-tint);
+    }
+
+    .whx-spine {
+      margin: 0;
+      writing-mode: vertical-rl;
+      font-family: var(--whx-serif);
+      font-size: 15px;
+      letter-spacing: 0.5em;
+      color: var(--whx-muted);
+      border-left: 1px solid var(--whx-ink);
+      padding-left: 18px;
+    }
+
+    /* ---------- 控制台 ---------- */
+    .whx-bench {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px 34px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--whx-ink);
+    }
+
+    .whx-bench-group { display: flex; align-items: center; gap: 10px; }
+
+    .whx-bench-label { font-size: 14px; color: var(--whx-muted); }
+
+    .whx-btn {
+      font-family: var(--whx-mono);
+      font-size: 13px;
+      padding: 5px 12px;
+      background: transparent;
+      border: 1px solid var(--whx-ink);
+      color: var(--whx-ink);
+      cursor: pointer;
+    }
+
+    .whx-btn:hover { background: var(--whx-ink); color: var(--whx-paper); }
+    .whx-btn:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 2px; }
+    .whx-btn.whx-active { background: var(--whx-ink); color: var(--whx-paper); }
+
+    .whx-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--whx-ink);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .whx-dot:focus-visible { outline: 2px solid var(--whx-ink); outline-offset: 2px; }
+    .whx-dot.whx-active { box-shadow: 0 0 0 3px var(--whx-paper), 0 0 0 5px var(--whx-ink); }
+
+    .whx-search {
+      font-family: var(--whx-sans);
+      font-size: 14px;
+      padding: 6px 12px;
+      width: 180px;
+      border: 1px solid var(--whx-ink);
+      background: transparent;
+      color: var(--whx-ink);
+    }
+
+    .whx-search:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 2px; }
+
+    .whx-bench-note { margin: 0 0 0 auto; font-size: 13px; color: var(--whx-muted); }
+
+    /* ---------- 字盘 ---------- */
+    .whx-section { padding: 34px 28px 0; }
+
+    .whx-section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .whx-section-title { margin: 0; font-family: var(--whx-serif); font-size: 22px; font-weight: 700; }
+
+    .whx-section-sub { margin: 0; font-size: 13px; color: var(--whx-muted); }
+
+    .whx-case {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+      gap: 1px;
+      background: var(--whx-ink); /* 共享细线 */
+      border: 2px solid var(--whx-ink);
+    }
+
+    .whx-cell {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--whx-paper);
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--whx-ink);
+      transition: background 0.15s ease;
+    }
+
+    .whx-cell i { font-size: var(--whx-size); line-height: 1; color: var(--whx-tint); }
+
+    .whx-cell:hover { background: color-mix(in srgb, var(--whx-tint) 14%, var(--whx-paper)); }
+    .whx-cell:focus-visible { outline: 3px solid var(--whx-tint); outline-offset: -3px; }
+
+    .whx-cell-name {
+      font-family: var(--whx-mono);
+      font-size: 11px;
+      color: var(--whx-muted);
+    }
+
+    .whx-empty {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--whx-muted);
+      font-size: 14px;
+      background: var(--whx-paper);
+      grid-column: 1 / -1;
+    }
+
+    /* 字盘空槽：补齐末行空轨道，露出的纸色即铅字盘的空位 */
+    .whx-pad { background: var(--whx-paper); }
+
+    /* ---------- 用法 ---------- */
+    .whx-usage { padding: 34px 28px 0; }
+
+    .whx-code {
+      margin: 0;
+      padding: 22px 26px;
+      background: var(--whx-ink);
+      color: var(--whx-paper);
+      font-family: var(--whx-mono);
+      font-size: 13.5px;
+      line-height: 1.9;
+      overflow-x: auto;
+    }
+
+    .whx-code .whx-cm { color: #9b948a; }
+    .whx-code .whx-tag { color: #8fc4ee; }
+    .whx-code .whx-attr { color: #f0a8cc; }
+
+    /* ---------- 页脚 ---------- */
+    .whx-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px 24px;
+      margin-top: 44px;
+      padding: 20px 28px 30px;
+      border-top: 2px solid var(--whx-ink);
+      font-size: 14px;
+    }
+
+    .whx-footer-brand { font-family: var(--whx-serif); font-weight: 700; }
+
+    .whx-footer nav { display: flex; gap: 20px; }
+
+    .whx-footer a { text-decoration: underline; text-underline-offset: 4px; }
+    .whx-footer a:hover { color: var(--whx-tint); }
+    .whx-footer a:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 3px; }
+
+    .whx-home { font-weight: 700; }
+
+    /* ---------- 提示条 ---------- */
+    .whx-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--whx-ink);
+      color: var(--whx-paper);
+      font-size: 13.5px;
+      padding: 10px 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      max-width: 88vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .whx-toast.whx-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ---------- 响应式 ---------- */
+    @media (max-width: 900px) {
+      .whx-hero { grid-template-columns: 1fr; gap: 20px; padding-top: 30px; }
+      .whx-hero-glyph { justify-self: start; font-size: clamp(110px, 34vw, 180px); }
+      .whx-spine {
+        writing-mode: horizontal-tb;
+        border-left: 0;
+        border-top: 1px solid var(--whx-ink);
+        padding: 10px 0 0;
+        letter-spacing: 0.3em;
+      }
+      .whx-bench-note { margin-left: 0; }
+      .whx-topbar { flex-wrap: wrap; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="whx-topbar">
+    <a class="whx-brand" href="index.html">墨与线<em> · </em>图标标本室</a>
+    <nav class="whx-nav">
+      <a href="index.html">首页</a>
+      <a class="whx-here" href="iconfont-1.html">字体图标</a>
+      <a href="iconfont-2.html">SVG 图标</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="whx-hero">
+      <div>
+        <p class="whx-hero-kicker">Font Awesome 6 Free 字体图标</p>
+        <h1 class="whx-hero-title">铸字<small>以字体文件交付的图标</small></h1>
+        <p class="whx-hero-lead">
+          每个字形被<strong>铸进字体文件</strong>，占一个字符编码，随文本一起渲染。
+          它继承文字的 font-size 与 color，改一个值，整盘字模同时改变。
+        </p>
+      </div>
+      <i class="fa-solid fa-pen-nib whx-hero-glyph" aria-hidden="true"></i>
+      <p class="whx-spine" aria-hidden="true">字盘一 · 实心字模</p>
+    </section>
+
+    <section class="whx-bench" aria-label="控制台">
+      <div class="whx-bench-group">
+        <span class="whx-bench-label">字号</span>
+        <button class="whx-btn" type="button" data-whx-size="24">24</button>
+        <button class="whx-btn whx-active" type="button" data-whx-size="40">40</button>
+        <button class="whx-btn" type="button" data-whx-size="64">64</button>
+      </div>
+      <div class="whx-bench-group">
+        <span class="whx-bench-label">墨色</span>
+        <button class="whx-dot whx-active" type="button" data-whx-tint="#0e63b6" style="background:#0e63b6" aria-label="蓝墨"></button>
+        <button class="whx-dot" type="button" data-whx-tint="#211e1b" style="background:#211e1b" aria-label="墨黑"></button>
+        <button class="whx-dot" type="button" data-whx-tint="#e84a9c" style="background:#e84a9c" aria-label="桃红"></button>
+      </div>
+      <div class="whx-bench-group">
+        <label class="whx-bench-label" for="whx-search">筛选</label>
+        <input class="whx-search" id="whx-search" type="search" placeholder="输入图标名…" autocomplete="off" />
+      </div>
+      <p class="whx-bench-note">点击任意字模，复制它的标签。</p>
+    </section>
+
+    <section class="whx-section">
+      <div class="whx-section-head">
+        <h2 class="whx-section-title">实心字模</h2>
+        <p class="whx-section-sub">fa-solid，共 26 枚</p>
+      </div>
+      <div class="whx-case" id="whx-case-solid">
+        <button class="whx-cell" type="button" data-whx-name="heart"><i class="fa-solid fa-heart" aria-hidden="true"></i><span class="whx-cell-name">heart</span></button>
+        <button class="whx-cell" type="button" data-whx-name="star"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="whx-cell-name">star</span></button>
+        <button class="whx-cell" type="button" data-whx-name="fire"><i class="fa-solid fa-fire" aria-hidden="true"></i><span class="whx-cell-name">fire</span></button>
+        <button class="whx-cell" type="button" data-whx-name="bolt"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span class="whx-cell-name">bolt</span></button>
+        <button class="whx-cell" type="button" data-whx-name="gem"><i class="fa-solid fa-gem" aria-hidden="true"></i><span class="whx-cell-name">gem</span></button>
+        <button class="whx-cell" type="button" data-whx-name="crown"><i class="fa-solid fa-crown" aria-hidden="true"></i><span class="whx-cell-name">crown</span></button>
+        <button class="whx-cell" type="button" data-whx-name="moon"><i class="fa-solid fa-moon" aria-hidden="true"></i><span class="whx-cell-name">moon</span></button>
+        <button class="whx-cell" type="button" data-whx-name="sun"><i class="fa-solid fa-sun" aria-hidden="true"></i><span class="whx-cell-name">sun</span></button>
+        <button class="whx-cell" type="button" data-whx-name="coffee"><i class="fa-solid fa-coffee" aria-hidden="true"></i><span class="whx-cell-name">coffee</span></button>
+        <button class="whx-cell" type="button" data-whx-name="camera"><i class="fa-solid fa-camera" aria-hidden="true"></i><span class="whx-cell-name">camera</span></button>
+        <button class="whx-cell" type="button" data-whx-name="music"><i class="fa-solid fa-music" aria-hidden="true"></i><span class="whx-cell-name">music</span></button>
+        <button class="whx-cell" type="button" data-whx-name="palette"><i class="fa-solid fa-palette" aria-hidden="true"></i><span class="whx-cell-name">palette</span></button>
+        <button class="whx-cell" type="button" data-whx-name="paintbrush"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i><span class="whx-cell-name">paintbrush</span></button>
+        <button class="whx-cell" type="button" data-whx-name="pen-nib"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i><span class="whx-cell-name">pen-nib</span></button>
+        <button class="whx-cell" type="button" data-whx-name="feather"><i class="fa-solid fa-feather" aria-hidden="true"></i><span class="whx-cell-name">feather</span></button>
+        <button class="whx-cell" type="button" data-whx-name="leaf"><i class="fa-solid fa-leaf" aria-hidden="true"></i><span class="whx-cell-name">leaf</span></button>
+        <button class="whx-cell" type="button" data-whx-name="droplet"><i class="fa-solid fa-droplet" aria-hidden="true"></i><span class="whx-cell-name">droplet</span></button>
+        <button class="whx-cell" type="button" data-whx-name="umbrella"><i class="fa-solid fa-umbrella" aria-hidden="true"></i><span class="whx-cell-name">umbrella</span></button>
+        <button class="whx-cell" type="button" data-whx-name="compass"><i class="fa-solid fa-compass" aria-hidden="true"></i><span class="whx-cell-name">compass</span></button>
+        <button class="whx-cell" type="button" data-whx-name="bell"><i class="fa-solid fa-bell" aria-hidden="true"></i><span class="whx-cell-name">bell</span></button>
+        <button class="whx-cell" type="button" data-whx-name="rocket"><i class="fa-solid fa-rocket" aria-hidden="true"></i><span class="whx-cell-name">rocket</span></button>
+        <button class="whx-cell" type="button" data-whx-name="gift"><i class="fa-solid fa-gift" aria-hidden="true"></i><span class="whx-cell-name">gift</span></button>
+        <button class="whx-cell" type="button" data-whx-name="lightbulb"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><span class="whx-cell-name">lightbulb</span></button>
+        <button class="whx-cell" type="button" data-whx-name="paper-plane"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><span class="whx-cell-name">paper-plane</span></button>
+        <button class="whx-cell" type="button" data-whx-name="snowflake"><i class="fa-solid fa-snowflake" aria-hidden="true"></i><span class="whx-cell-name">snowflake</span></button>
+        <button class="whx-cell" type="button" data-whx-name="wand-magic-sparkles"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span class="whx-cell-name">wand-magic-sparkles</span></button>
+      </div>
+    </section>
+
+    <section class="whx-section">
+      <div class="whx-section-head">
+        <h2 class="whx-section-title">品牌字模</h2>
+        <p class="whx-section-sub">fa-brands，共 8 枚</p>
+      </div>
+      <div class="whx-case" id="whx-case-brands">
+        <button class="whx-cell" type="button" data-whx-name="github"><i class="fa-brands fa-github" aria-hidden="true"></i><span class="whx-cell-name">github</span></button>
+        <button class="whx-cell" type="button" data-whx-name="weibo"><i class="fa-brands fa-weibo" aria-hidden="true"></i><span class="whx-cell-name">weibo</span></button>
+        <button class="whx-cell" type="button" data-whx-name="weixin"><i class="fa-brands fa-weixin" aria-hidden="true"></i><span class="whx-cell-name">weixin</span></button>
+        <button class="whx-cell" type="button" data-whx-name="qq"><i class="fa-brands fa-qq" aria-hidden="true"></i><span class="whx-cell-name">qq</span></button>
+        <button class="whx-cell" type="button" data-whx-name="html5"><i class="fa-brands fa-html5" aria-hidden="true"></i><span class="whx-cell-name">html5</span></button>
+        <button class="whx-cell" type="button" data-whx-name="css3-alt"><i class="fa-brands fa-css3-alt" aria-hidden="true"></i><span class="whx-cell-name">css3-alt</span></button>
+        <button class="whx-cell" type="button" data-whx-name="js"><i class="fa-brands fa-js" aria-hidden="true"></i><span class="whx-cell-name">js</span></button>
+        <button class="whx-cell" type="button" data-whx-name="node-js"><i class="fa-brands fa-node-js" aria-hidden="true"></i><span class="whx-cell-name">node-js</span></button>
+      </div>
+    </section>
+
+    <section class="whx-usage">
+      <div class="whx-section-head">
+        <h2 class="whx-section-title">用法</h2>
+        <p class="whx-section-sub">字体图标：引样式，写类名</p>
+      </div>
+      <pre class="whx-code"><code><span class="whx-cm">&lt;!-- 引入本地字体图标样式（webfonts 目录随行） --&gt;</span>
+<span class="whx-tag">&lt;link</span> <span class="whx-attr">rel</span>=<span class="whx-cm">"stylesheet"</span> <span class="whx-attr">href</span>=<span class="whx-cm">"cdn/css/all.min.css"</span><span class="whx-tag">&gt;</span>
+
+<span class="whx-cm">&lt;!-- 使用：fa-solid 实心 / fa-brands 品牌 --&gt;</span>
+<span class="whx-tag">&lt;i</span> <span class="whx-attr">class</span>=<span class="whx-cm">"fa-solid fa-pen-nib"</span><span class="whx-tag">&gt;&lt;/i&gt;</span></code></pre>
+    </section>
+  </main>
+
+  <footer class="whx-footer">
+    <span class="whx-footer-brand">墨与线 · 图标双页标本</span>
+    <nav>
+      <a class="whx-home" href="index.html">返回首页</a>
+      <a href="iconfont-2.html">看另一页：SVG 图标</a>
+    </nav>
+  </footer>
+
+  <div class="whx-toast" id="whx-toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      var whxRoot = document.documentElement;
+      var whxToast = document.getElementById('whx-toast');
+      var whxToastTimer = null;
+      var whxSearch = document.getElementById('whx-search');
+      var whxCells = document.querySelectorAll('.whx-cell');
+
+      // 提示条
+      function whxShowToast(msg) {
+        whxToast.textContent = msg;
+        whxToast.classList.add('whx-show');
+        clearTimeout(whxToastTimer);
+        whxToastTimer = setTimeout(function () {
+          whxToast.classList.remove('whx-show');
+        }, 1800);
+      }
+
+      // 复制（file:// 下剪贴板 API 可能受限，提供回退）
+      function whxCopy(text) {
+        function whxFallback() {
+          var whxTa = document.createElement('textarea');
+          whxTa.value = text;
+          whxTa.style.position = 'fixed';
+          whxTa.style.opacity = '0';
+          document.body.appendChild(whxTa);
+          whxTa.select();
+          try { document.execCommand('copy'); whxShowToast('已复制 ' + text); }
+          catch (e) { whxShowToast('复制失败，请手动复制：' + text); }
+          document.body.removeChild(whxTa);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            whxShowToast('已复制 ' + text);
+          }, whxFallback);
+        } else {
+          whxFallback();
+        }
+      }
+
+      // 字号
+      var whxSizeBtns = document.querySelectorAll('[data-whx-size]');
+      whxSizeBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          whxRoot.style.setProperty('--whx-size', btn.dataset.whxSize + 'px');
+          whxSizeBtns.forEach(function (b) { b.classList.remove('whx-active'); });
+          btn.classList.add('whx-active');
+        });
+      });
+
+      // 墨色
+      var whxDots = document.querySelectorAll('[data-whx-tint]');
+      whxDots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          whxRoot.style.setProperty('--whx-tint', dot.dataset.whxTint);
+          whxDots.forEach(function (d) { d.classList.remove('whx-active'); });
+          dot.classList.add('whx-active');
+        });
+      });
+
+      // 字盘空槽：按当前列数补齐末行，避免墨色底露出
+      var whxCases = document.querySelectorAll('.whx-case');
+      function whxPadCase(box) {
+        Array.prototype.forEach.call(box.querySelectorAll('.whx-pad'), function (f) {
+          f.parentNode.removeChild(f);
+        });
+        var whxShown = 0;
+        Array.prototype.forEach.call(box.querySelectorAll('.whx-cell'), function (c) {
+          if (c.style.display !== 'none') whxShown++;
+        });
+        if (!whxShown) return;
+        var whxCols = getComputedStyle(box).gridTemplateColumns.split(' ').length;
+        var whxNeed = (whxCols - (whxShown % whxCols)) % whxCols;
+        for (var i = 0; i < whxNeed; i++) {
+          var f = document.createElement('div');
+          f.className = 'whx-pad';
+          f.setAttribute('aria-hidden', 'true');
+          box.appendChild(f);
+        }
+      }
+      function whxPadAll() {
+        Array.prototype.forEach.call(whxCases, whxPadCase);
+      }
+      whxPadAll();
+      var whxPadTick = 0;
+      window.addEventListener('resize', function () {
+        if (whxPadTick) return;
+        whxPadTick = requestAnimationFrame(function () {
+          whxPadTick = 0;
+          whxPadAll();
+        });
+      });
+
+      // 筛选
+      whxSearch.addEventListener('input', function () {
+        var q = whxSearch.value.trim().toLowerCase();
+        var whxVisible = 0;
+        whxCells.forEach(function (cell) {
+          var hit = cell.dataset.whxName.indexOf(q) !== -1;
+          cell.style.display = hit ? '' : 'none';
+          if (hit) whxVisible++;
+        });
+        document.querySelectorAll('.whx-empty').forEach(function (el) { el.remove(); });
+        if (whxVisible === 0 && q !== '') {
+          var whxEmpty = document.createElement('p');
+          whxEmpty.className = 'whx-empty';
+          whxEmpty.textContent = '字盘里没有这个字形，换个名字试试。';
+          document.getElementById('whx-case-solid').appendChild(whxEmpty);
+        }
+        whxPadAll();
+      });
+
+      // 点击复制标签
+      whxCells.forEach(function (cell) {
+        cell.addEventListener('click', function () {
+          whxCopy('<i class="fa-' + (cell.closest('#whx-case-brands') ? 'brands' : 'solid') + ' fa-' + cell.dataset.whxName + '"></i>');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

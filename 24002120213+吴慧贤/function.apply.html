@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓小球游戏|函数的三个方法的应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f8ff;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 24px;
+        }
+
+        #info {
+            padding: 16px;
+            background: #222;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ball {
+            width: var(--ball-size, 50px);
+            height: var(--ball-size, 50px);
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            border: 0;
+        }
+
+        .ball.clicked {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="info">
+        当前分数：<span id="score">0</span>
+        <span id="status">点击所有小球（每 3 秒结算）！</span>
+    </div>
+
+    <script>
+        const game = {
+            score: 0,
+            balls: [],
+            ballCount: 5,
+            width: 50,
+            timer: null
+        };
+
+        const scoreDom = document.getElementById("score");
+        const statusDom = document.getElementById("status");
+
+        function createBalls() {
+            for (let i = 0; i < game.ballCount; i++) {
+                const ball = document.createElement("button");
+                ball.type = "button";
+                ball.className = "ball";
+                ball.setAttribute("aria-label", `小球 ${i + 1}`);
+                ball.addEventListener("click", function () {
+                    if (ball.classList.contains("clicked")) return;
+                    ball.classList.add("clicked");
+                    updateStatus();
+                });
+                document.body.appendChild(ball);
+                game.balls.push(ball);
+            }
+        }
+
+        function shuffle(items) {
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+            return items;
+        }
+
+        function moveBalls() {
+            const infoHeight = document.getElementById("info").getBoundingClientRect().height;
+            const playHeight = Math.max(0, window.innerHeight - infoHeight);
+            const gap = 10;
+            let ballSize = game.width;
+            let columns;
+            let rows;
+
+            do {
+                columns = Math.max(1, Math.floor((window.innerWidth + gap) / (ballSize + gap)));
+                rows = Math.max(1, Math.floor((playHeight + gap) / (ballSize + gap)));
+                if (columns * rows >= game.balls.length || ballSize <= 1) break;
+                ballSize -= 1;
+            } while (true);
+
+            game.width = ballSize;
+            const capacity = Math.max(1, columns * rows);
+            const positions = shuffle(
+                Array.from({ length: capacity }, (_, index) => index)
+            ).slice(0, game.balls.length);
+
+            game.balls.forEach((ball, index) => {
+                const position = positions[index] || 0;
+                const column = position % columns;
+                const row = Math.floor(position / columns);
+                ball.style.setProperty("--ball-size", `${ballSize}px`);
+                ball.style.left = `${column * (ballSize + gap)}px`;
+                ball.style.top = `${infoHeight + row * (ballSize + gap)}px`;
+            });
+        }
+
+        function updateStatus() {
+            const clickedCount = game.balls.filter(ball =>
+                ball.classList.contains("clicked")
+            ).length;
+            statusDom.textContent = `已点击 ${clickedCount}/${game.balls.length} 个`;
+        }
+
+        function finishRound() {
+            const allClicked = game.balls.every(ball =>
+                ball.classList.contains("clicked")
+            );
+
+            game.score += allClicked ? 2 : -1;
+            scoreDom.textContent = game.score;
+            statusDom.textContent = allClicked ? "全部点中！+2" : "未全部点中！-1";
+
+            game.balls.forEach(ball => ball.classList.remove("clicked"));
+            moveBalls();
+        }
+
+        createBalls();
+        moveBalls();
+        window.setInterval(function () {
+            finishRound();
+        }, 3000);
+
+        window.addEventListener("resize", moveBalls);
+    </script>
+</body>
+</html>
