@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-04 | 使用大模型：GLM-5.3-Flash | 功能名称：SUV导购新闻版块（五页合并单页选项卡切换） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUV 导购新闻版块 · 单页选项卡</title>
+  <style>
+    /* 作者：吴慧贤 —— 全部类名、id、JS 变量均以 whx_ 开头 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      background: #fff;
+      font-family: SimSun, "宋体", "Microsoft YaHei", serif;
+      padding: 30px 0 50px;
+    }
+
+    a { text-decoration: none; }
+
+    /* 返回课程首页入口（站点导航规范） */
+    .whx_back {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 12px;
+      font-family: "Microsoft YaHei", sans-serif;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .whx_back:hover { color: #1b62c7; }
+
+    /* 版块外框：宽度收缩至内容实际宽度；顶部留白让选中项上浮时不触碰边框 */
+    .whx_box {
+      width: fit-content;
+      margin: 0 auto;
+      background: #fff;
+      padding: 16px 18px 26px;
+    }
+
+    /* ---------- 顶部灰色选项卡条（收窄内边距，使灰条宽度与列表对齐） ---------- */
+    .whx_tabbar {
+      display: flex;
+      align-items: flex-end;
+      height: 48px;
+      margin: 0 -18px;          /* 让灰条通到边框两侧 */
+      padding: 0 8px 0 14px;
+      background: #e6e6e6;
+    }
+
+    .whx_tab {
+      height: 48px;
+      line-height: 48px;
+      padding: 0 16px;
+      font-size: 19px;
+      color: #1b62c7;
+      cursor: pointer;
+    }
+
+    .whx_tab:hover { text-decoration: underline; }
+
+    /* 选中项：白色底、蓝色顶线、加粗，向下凸出灰条 */
+    .whx_tab_active {
+      position: relative;
+      height: 56px;             /* 比灰条高出 8px，形成下凸 */
+      line-height: 52px;
+      background: #fff;
+      border-top: 4px solid #1b62c7;
+      color: #000;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .whx_tab_active:hover { text-decoration: none; }
+
+    /* ---------- 红色大标题（比列表文字大一号，布局紧凑） ---------- */
+    .whx_headline {
+      margin: 24px 0 12px 14px;
+      font-size: 21px;
+      font-weight: bold;
+      color: #cc0000;
+    }
+
+    /* ---------- 新闻列表 ---------- */
+    .whx_list {
+      list-style: none;
+      padding: 0 0 0 14px;
+    }
+
+    .whx_list li {
+      display: flex;
+      align-items: baseline;
+      padding: 10px 0;
+      font-size: 19px;
+    }
+
+    /* 小方块项目符号 */
+    .whx_list li::before {
+      content: "";
+      flex: none;
+      width: 7px;
+      height: 7px;
+      margin-right: 12px;
+      background: #777;
+      align-self: center;
+    }
+
+    .whx_list a {
+      color: #1b62c7;
+      margin-right: 12px;
+    }
+
+    .whx_list a:hover { text-decoration: underline; }
+
+    /* 日期靠行右端对齐，使每一行铺满版块宽度，整体不留空隙 */
+    .whx_date {
+      flex: none;
+      margin-left: auto;
+      font-size: 16px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <a class="whx_back" href="index.html">← 返回课程首页 index.html</a>
+
+  <div class="whx_box" id="whx_suv_module">
+    <!-- 选项卡条：点击切换下方对应面板，SUV 为默认选中项 -->
+    <div class="whx_tabbar" id="whx_tabbar">
+      <a class="whx_tab" data-whx-tab="daogou">导购</a>
+      <a class="whx_tab" data-whx-tab="p39">3-9万</a>
+      <a class="whx_tab" data-whx-tab="p917">9-17万</a>
+      <a class="whx_tab" data-whx-tab="p1742">17-42万</a>
+      <a class="whx_tab whx_tab_active" data-whx-tab="suv">SUV</a>
+    </div>
+
+    <!-- 面板：导购 -->
+    <section class="whx_panel" data-whx-panel="daogou" hidden>
+      <h2 class="whx_headline">B级品质满足A级需求 路盛E70亮点详解析</h2>
+      <ul class="whx_list">
+        <li><a href="#">购车必看 凯迪拉克XTS领先型28T深度体验</a><span class="whx_date">12/20</span></li>
+        <li><a href="#">爸爸去哪？亲子出游适合车型和注意事项</a><span class="whx_date">12/20</span></li>
+        <li><a href="#">推荐：X1等城市四驱Style+经济省油的SUV</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">全景天窗/保养便利 30万办齐四驱SUV推荐</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">全民摇号时代？六款低价占号必备车型推荐</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">最高暴降20万！奥迪Q5等年底特惠SUV盘点</a><span class="whx_date">12/18</span></li>
+      </ul>
+    </section>
+
+    <!-- 面板：3-9万 -->
+    <section class="whx_panel" data-whx-panel="p39" hidden>
+      <h2 class="whx_headline">最低仅4.6万元起 超低价SUV购买价值点评</h2>
+      <ul class="whx_list">
+        <li><a href="#">全民摇号时代？六款低价占号必备车型推荐</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">凌派/观致3等 2013年全新热门家用车盘点</a><span class="whx_date">12/11</span></li>
+        <li><a href="#">坚持低价高配路线！静态评测华泰路盛E70</a><span class="whx_date">12/09</span></li>
+        <li><a href="#">买车先看销量 10月份销量前十名轿车盘点</a><span class="whx_date">11/29</span></li>
+        <li><a href="#">抄底正当时 车展后清仓优惠老款车型推荐</a><span class="whx_date">11/28</span></li>
+        <li><a href="#">土豪气质 细数车展那些低价车上的“神器”</a><span class="whx_date">11/27</span></li>
+      </ul>
+    </section>
+
+    <!-- 面板：9-17万 -->
+    <section class="whx_panel" data-whx-panel="p917" hidden>
+      <h2 class="whx_headline">15万级降价车谁更值 预算/油耗/空间较量</h2>
+      <ul class="whx_list">
+        <li><a href="#">爸爸去哪？亲子出游适合车型和注意事项</a><span class="whx_date">12/20</span></li>
+        <li><a href="#">最高暴降20万！奥迪Q5等年底特惠SUV盘点</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">配侧气帘值得肯定！传祺GA3碰撞试验图解</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">高尔夫7≠两厢版速腾 配置/动力差异解读</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">花小钱也能养SUV 翼博等入门SUV使用手册</a><span class="whx_date">12/17</span></li>
+        <li><a href="#">最高优惠4.3万 十款15万SUV年末购买推荐</a><span class="whx_date">12/16</span></li>
+      </ul>
+    </section>
+
+    <!-- 面板：17-42万 -->
+    <section class="whx_panel" data-whx-panel="p1742" hidden>
+      <h2 class="whx_headline">改变品牌的未来 认识豪华品牌最便宜车型</h2>
+      <ul class="whx_list">
+        <li><a href="#">爸爸去哪？亲子出游适合车型和注意事项</a><span class="whx_date">12/20</span></li>
+        <li><a href="#">推荐：X1等城市四驱Style+经济省油的SUV</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">全景天窗/保养便利 30万办齐四驱SUV推荐</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">最高暴降20万！奥迪Q5等年底特惠SUV盘点</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">比拼硬实力 8款低配四驱紧凑SUV性能点评</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">新蒙迪欧/雅阁等！盘点2013中级车大变脸</a><span class="whx_date">12/17</span></li>
+      </ul>
+    </section>
+
+    <!-- 面板：SUV（默认显示） -->
+    <section class="whx_panel" data-whx-panel="suv">
+      <h2 class="whx_headline">改变品牌的未来 认识豪华品牌最便宜车型</h2>
+      <ul class="whx_list">
+        <li><a href="#">推荐：X1等城市四驱Style+经济省油的SUV</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">全景天窗/保养便利 30万办齐四驱SUV推荐</a><span class="whx_date">12/19</span></li>
+        <li><a href="#">最高暴降20万！奥迪Q5等年底特惠SUV盘点</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">比拼硬实力 8款低配四驱紧凑SUV性能点评</a><span class="whx_date">12/18</span></li>
+        <li><a href="#">花小钱也能养SUV 翼博等入门SUV使用手册</a><span class="whx_date">12/17</span></li>
+        <li><a href="#">最高优惠4.3万 十款15万SUV年末购买推荐</a><span class="whx_date">12/16</span></li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    // 根据选项卡 key 切换显示对应面板：先隐藏全部面板，再显示目标面板
+    function whxShowPanel(whxKey) {
+      var whxPanels = document.querySelectorAll('.whx_panel');
+      whxPanels.forEach(function (whxPanel) {
+        whxPanel.hidden = whxPanel.dataset.whxPanel !== whxKey;
+      });
+    }
+
+    // 先清除所有选项卡的选中状态，再设置当前元素的选中状态
+    function whxSelectTab(whxTargetTab) {
+      var whxTabs = document.querySelectorAll('.whx_tab');
+      // 第一步：清除所有选项卡的选中状态
+      whxTabs.forEach(function (whxTab) {
+        whxTab.classList.remove('whx_tab_active');
+      });
+      // 第二步：设置当前元素的选中状态
+      whxTargetTab.classList.add('whx_tab_active');
+    }
+
+    // 初始化选项卡：为每个选项卡绑定点击监听事件
+    function whxInitTabs() {
+      var whxTabs = document.querySelectorAll('.whx_tab');
+      whxTabs.forEach(function (whxTab) {
+        whxTab.addEventListener('click', function () {
+          // 先清除所有选中再设置当前项，并联动切换面板
+          whxSelectTab(whxTab);
+          whxShowPanel(whxTab.dataset.whxTab);
+        });
+      });
+    }
+
+    // 页面加载完成即初始化选项卡
+    whxInitTabs();
+  </script>
+</body>
+</html>
