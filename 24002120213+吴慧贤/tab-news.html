@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-04 | 使用大模型：GLM-5.3-Flash | 功能名称：新闻选项卡 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新闻选项卡 · JS Tab 组件</title>
+  <style>
+    :root {
+      --whx-paper: #f3f1ec;
+      --whx-ink: #211e1b;
+      --whx-muted: #352c1f;
+      --whx-blue: #0e63b6;
+      --whx-tint: var(--whx-blue);
+      --whx-serif: "Noto Serif SC", "Source Han Serif SC", "STZhongsong", SimSun, serif;
+      --whx-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      background: var(--whx-paper);
+      color: var(--whx-ink);
+      font-family: var(--whx-sans);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    a { color: inherit; }
+
+    .whx-stage {
+      max-width: 720px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 0 20px;
+    }
+
+    /* 页头：品牌与返回首页入口 */
+    .whx-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 0 14px;
+      border-bottom: 2px solid var(--whx-ink);
+    }
+
+    .whx-brand {
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: 17px;
+      text-decoration: none;
+    }
+
+    .whx-brand em { font-style: normal; color: var(--whx-tint); }
+
+    .whx-home {
+      font-size: 13px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .whx-home:hover { color: var(--whx-tint); }
+    .whx-home:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: 3px; }
+
+    .whx-main { padding: 26px 0 60px; }
+
+    .whx-kicker { margin: 0 0 8px; font-size: 13px; color: var(--whx-muted); }
+
+    .whx-title {
+      margin: 0 0 22px;
+      font-family: var(--whx-serif);
+      font-weight: 700;
+      font-size: 34px;
+      line-height: 1.2;
+    }
+
+    /* 选项卡栏：按钮行 + 底部基线 */
+    .whx-tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid var(--whx-ink);
+      flex-wrap: wrap;
+    }
+
+    .whx-tab-btn {
+      position: relative;
+      padding: 10px 18px;
+      background: none;
+      border: 0;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--whx-muted);
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .whx-tab-btn::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -2px;
+      height: 3px;
+      background: var(--whx-tint);
+      transform: scaleX(0);
+      transition: transform 0.18s ease;
+    }
+
+    .whx-tab-btn:hover { color: var(--whx-ink); }
+    .whx-tab-btn:focus-visible { outline: 2px solid var(--whx-tint); outline-offset: -2px; }
+
+    .whx-tab-btn.whx-active { color: var(--whx-tint); font-weight: 700; }
+    .whx-tab-btn.whx-active::after { transform: scaleX(1); }
+
+    /* 内容面板与新闻列表 */
+    .whx-panel { padding: 6px 4px 0; }
+
+    .whx-panel p.whx-panel-lead { color: var(--whx-muted); font-size: 13px; margin: 12px 0 0; }
+
+    .whx-news-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .whx-news-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 14px 6px;
+      border-bottom: 1px solid rgba(33, 30, 27, 0.15);
+      transition: background 0.15s ease;
+    }
+
+    .whx-news-list li:hover { background: rgba(14, 99, 182, 0.06); }
+
+    .whx-news-list time {
+      flex: none;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      color: var(--whx-muted);
+    }
+
+    .whx-news-list strong { font-weight: 600; font-size: 15px; }
+
+    .whx-footer {
+      padding: 16px 0 40px;
+      border-top: 1px solid var(--whx-ink);
+      font-size: 13px;
+      color: var(--whx-muted);
+    }
+
+    .whx-footer a { text-decoration: underline; text-underline-offset: 4px; }
+    .whx-footer a:hover { color: var(--whx-tint); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="whx-stage">
+    <header class="whx-header">
+      <a class="whx-brand" href="index.html">墨与线<em> · </em>新闻选项卡</a>
+      <a class="whx-home" href="index.html">返回首页 index.html</a>
+    </header>
+
+    <main class="whx-main">
+      <p class="whx-kicker">JavaScript 选项卡组件 · 外部 js/whx-tab.js · 可复用</p>
+      <h1 class="whx-title">今日新闻</h1>
+
+      <!-- 选项卡：国内新闻为默认选中项 -->
+      <div class="whx-tabs" id="whx-news-tabs" role="tablist" aria-label="新闻分类">
+        <button class="whx-tab-btn whx-active" type="button" role="tab" aria-selected="true" data-whx-tab="domestic">国内新闻</button>
+        <button class="whx-tab-btn" type="button" role="tab" aria-selected="false" data-whx-tab="province">省内新闻</button>
+        <button class="whx-tab-btn" type="button" role="tab" aria-selected="false" data-whx-tab="world">国际新闻</button>
+        <button class="whx-tab-btn" type="button" role="tab" aria-selected="false" data-whx-tab="hot">最热新闻</button>
+      </div>
+
+      <!-- 面板：与 data-whx-tab 一一对应 -->
+      <section class="whx-panel" data-whx-panel="domestic" role="tabpanel">
+        <ul class="whx-news-list">
+          <li><time>11-04</time><strong>全国高校网页设计课程实践展启动，优秀作品将集中巡展</strong></li>
+          <li><time>11-03</time><strong>新一代国产浏览器内核完成内测，渲染性能提升明显</strong></li>
+          <li><time>11-02</time><strong>多地推出数字政务"一网通办"升级版，办事材料再精简</strong></li>
+          <li><time>11-01</time><strong>快递业进入旺季，全行业部署智能分拣保障时效</strong></li>
+        </ul>
+        <p class="whx-panel-lead">以上为课堂练习演示内容，非真实新闻。</p>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="province" role="tabpanel" hidden>
+        <ul class="whx-news-list">
+          <li><time>11-04</time><strong>省内多所高职院校联合开设前端开发实训营，报名火热</strong></li>
+          <li><time>11-03</time><strong>城市地铁新线路进入空载试运行阶段</strong></li>
+          <li><time>11-02</time><strong>全省数字文创大赛收官，学生团队作品获多项大奖</strong></li>
+        </ul>
+        <p class="whx-panel-lead">以上为课堂练习演示内容，非真实新闻。</p>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="world" role="tabpanel" hidden>
+        <ul class="whx-news-list">
+          <li><time>11-04</time><strong>国际开源社区发布年度报告，Web 标准演进提速</strong></li>
+          <li><time>11-03</time><strong>多国高校探索 AI 辅助编程教学新模式</strong></li>
+          <li><time>11-01</time><strong>全球数字经济峰会呼吁加强跨境数据治理合作</strong></li>
+        </ul>
+        <p class="whx-panel-lead">以上为课堂练习演示内容，非真实新闻。</p>
+      </section>
+
+      <section class="whx-panel" data-whx-panel="hot" role="tabpanel" hidden>
+        <ul class="whx-news-list">
+          <li><time>11-04</time><strong>"用 AI 写网页靠谱吗"引发课堂大讨论，热度第一</strong></li>
+          <li><time>11-04</time><strong>CSS 新特性教程全网刷屏，容器查询成新宠</strong></li>
+          <li><time>11-03</time><strong>程序员吐槽帖冲上热榜：需求又改了三遍</strong></li>
+          <li><time>11-02</time><strong>浏览器 DevTools 隐藏技巧合集被疯转</strong></li>
+        </ul>
+        <p class="whx-panel-lead">以上为课堂练习演示内容，非真实新闻。</p>
+      </section>
+    </main>
+
+    <footer class="whx-footer">
+      <a href="index.html">返回课程首页</a> · 吴慧贤《高级网页设计》课堂实践
+    </footer>
+  </div>
+
+  <!-- 选项卡逻辑在 js/whx-tab.js 中，外部引用 -->
+  <script src="js/whx-tab.js"></script>
+</body>
+</html>
