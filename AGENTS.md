@@ -4,8 +4,8 @@ Static coursework site for 《高级网页设计》. There is no build, test, li
 
 ## Repo layout
 
-- Git root is this folder (`wuhuixian`); the site itself lives in `24002120213+吴慧贤/`. Serve from that subfolder.
-- `24002120213+吴慧贤/index.html` is the course hub. When adding a lesson page, also add a card plus nav/footer link there.
+- Git root is this folder (`wuhuixian`); the site itself lives in `24002120213-wuhuixian/`（原名 `24002120213+吴慧贤`，2026-11-04 因 GitHub Pages 链接兼容性改为纯英文）. Serve from that subfolder.
+- `24002120213-wuhuixian/index.html` is the course hub. When adding a lesson page, also add a card plus nav/footer link there.
 - `css/` holds shared styles (`flex_css005.css`, `svg.css`). Most other pages keep CSS/JS inline.
 - `cdn/` holds vendored Font Awesome (`cdn/css/all.min.css`, `cdn/webfonts/`) and `lucide.min.js`.
 - `font/` holds the local iconfont kit; `font/demo_index.html` is the icon demo page.
@@ -13,7 +13,7 @@ Static coursework site for 《高级网页设计》. There is no build, test, li
 
 ## Preview
 
-From `24002120213+吴慧贤/`:
+From `24002120213-wuhuixian/`:
 
 ```powershell
 python -m http.server 8080
