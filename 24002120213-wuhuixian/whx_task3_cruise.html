@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-08 | 使用大模型：GLM-5.3-Flash | 功能名称：任务三·综合创作（第六件展品爱达·魔都号 + mousewheel滚轮控制与对话记录） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>任务三 · 综合创作 · 新展品与新能力记录</title>
+  <style>
+    :root {
+      --whx-paper: #f3f1ec;
+      --whx-ink: #211e1b;
+      --whx-muted: #6f6a62;
+      --whx-blue: #0e63b6;
+      --whx-red: #e64530;
+      --whx-line: #d8d3c8;
+      --whx-serif: "Noto Serif SC", "Source Han Serif SC", SimSun, serif;
+      --whx-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      --whx-mono: Consolas, "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--whx-paper); color: var(--whx-ink); font-family: var(--whx-sans); line-height: 1.75; }
+    .whx_sheet { max-width: 860px; margin: 0 auto; padding: 48px 32px 72px; }
+    .whx_back { display: inline-block; margin-bottom: 24px; color: var(--whx-blue); text-decoration: none; }
+    .whx_back:hover { text-decoration: underline; }
+    h1 { font-family: var(--whx-serif); font-size: 30px; margin: 0 0 6px; }
+    .whx_sub { color: var(--whx-muted); font-size: 14px; margin-bottom: 32px; }
+    .whx_card { background: #fff; border: 1px solid var(--whx-line); border-radius: 6px; padding: 24px 28px; margin-bottom: 24px; }
+    .whx_card h2 { font-family: var(--whx-serif); font-size: 20px; margin: 0 0 12px; padding-left: 10px; border-left: 4px solid var(--whx-blue); }
+    .whx_label { font-size: 13px; color: var(--whx-muted); margin: 14px 0 6px; }
+    .whx_say { background: var(--whx-paper); border: 1px dashed var(--whx-line); border-radius: 4px; padding: 12px 16px; font-size: 15px; }
+    pre { background: #1f1d1a; color: #e8e4db; border-radius: 4px; padding: 14px 16px; font-family: var(--whx-mono); font-size: 13.5px; line-height: 1.6; overflow-x: auto; margin: 8px 0 4px; }
+    .whx_ok { background: #eef6ee; border-left: 4px solid #3e8e41; padding: 10px 14px; margin: 8px 0; font-size: 14.5px; }
+    .whx_fix { background: #fdf3e7; border-left: 4px solid var(--whx-red); padding: 10px 14px; margin: 10px 0 4px; font-size: 14.5px; }
+    .whx_shot { margin-top: 6px; font-size: 13px; color: var(--whx-muted); border: 1px dashed var(--whx-line); border-radius: 4px; padding: 10px 14px; }
+    .whx_pic { max-width: 100%; border-radius: 4px; border: 1px solid var(--whx-line); display: block; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="whx_sheet">
+    <a class="whx_back" href="index.html">← 返回课堂实践中心</a>
+    <h1>任务三 · 综合创作 + 技术答辩</h1>
+    <p class="whx_sub">两件事：① 给光影展添第六件展品「爱达·魔都号」（AI 生成横版 16:9 图片）；② 加一个课堂没讲的 Swiper 能力——<b>mousewheel 滚轮翻页</b>，附关键 AI 对话记录。</p>
+
+    <div class="whx_card">
+      <h2>一 · 第六件展品：爱达·魔都号</h2>
+      <p class="whx_label">我发给 AI 的生图提示词：</p>
+      <div class="whx_say">为"大国重器光影展"网页照片墙生成：中国首艘国产大型邮轮"爱达·魔都号"，白色船体配深蓝色水线与橙黄色烟囱，航行在夕阳金色海面上，航拍四分之三视角，写实旅行摄影风格，细节锐利，16:9 横版。</div>
+      <img class="whx_pic" src="swiper-imgs/aidao_1_1.jpg" alt="爱达·魔都号 AI 生成图">
+      <p>图片已保存为 <code>swiper-imgs/aidao_1_1.jpg</code>，并按既有展品相同的结构补进 <code>#wySw4</code>（img + wy-cap 标题 + 说明），文字注明"AI 生成图"。</p>
+    </div>
+
+    <div class="whx_card">
+      <h2>二 · 新能力：mousewheel 滚轮翻页</h2>
+      <p class="whx_label">我发给 AI 的提问：</p>
+      <div class="whx_say">Swiper 6 想让鼠标滚轮翻页怎么配？它和已有的 loop 循环、autoplay 自动播放会冲突吗？另外怎么防止光标放在轮播上时页面就没法滚动了？</div>
+      <p class="whx_label">AI 给出的配置（节选）：</p>
+      <pre>mousewheel: {
+  releaseOnEdges: true,   // AI 建议：到头了把滚轮还给页面
+}</pre>
+      <p class="whx_label">亲手验证 + 翻源码后发现 AI 的建议不对：</p>
+      <div class="whx_fix">AI 说"到头了会把滚轮还给页面"，但在 <b>loop 循环模式下这是无效药方</b>——翻开 Swiper 6.8.4 源码 mousewheel.js 第 382~386 行：<code>if (swiper.isEnd &amp;&amp; !swiper.params.loop &amp;&amp; params.releaseOnEdges)</code>，条件里明确排除了 loop；循环模式永远不存在"到头"。我的修改：把 <code>releaseOnEdges</code> 显式写成 <code>false</code> 并加注释说明原因，防止以后误读。</div>
+      <p class="whx_label">最终写入页面的配置（初始化与销毁重建两处都加了）：</p>
+      <pre>mousewheel: {
+  invert: false,        // 滚轮向下 = 翻下一张（自然方向）
+  forceToAxis: false,   // 不锁定轴向，普通鼠标竖向滚轮即可翻页
+  releaseOnEdges: false,// loop 模式没有"边缘"，此项无效，显式声明防误读
+},</pre>
+      <div class="whx_ok">验证结论（本地 Swiper 6.8.4 自动化实测，5 项全过）：① 悬停轮播滚轮向下连续翻下一张；② 向上滚回上一张；③ 第 6 张再往下滚循环回第 1 张；④ 光标移到轮播外滚轮正常滚动页面（源码 mouseEntered 判断接管范围，不会劫持全页）；⑤ 无控制台报错。</div>
+      <div class="whx_shot">📸 截图占位：请粘贴 swiper-task.html 演示四中滚轮翻到"爱达·魔都号"时的截图、以及轮播外滚页面正常的对比截图。</div>
+    </div>
+
+    <div class="whx_card">
+      <h2>三 · 答辩四连问 · 自答</h2>
+      <p><b>问 1：这段代码什么意思？</b><br>答：mousewheel 模块监听轮播容器上的滚轮事件，把滚轮增量换算成"上一张 / 下一张"。<code>invert</code> 控制方向；<code>forceToAxis</code> 决定是否只认滚轮的轴向增量；接管范围由源码里的 <code>mouseEntered</code> 判断——光标悬停在轮播上才接管，移开就还给大家。</p>
+      <p><b>问 2：AI 第一次给的哪里不对，你改了什么？</b><br>答：AI 建议加 <code>releaseOnEdges: true</code> 防止"劫持页面"，但我们的轮播是 loop 循环模式——源码里该逻辑被 <code>!swiper.params.loop</code> 短路，永远不生效。我把它改成显式 <code>false</code> 并写注释说明：防劫持靠的不是这个参数，而是 mouseEntered 的悬停判断。</p>
+      <p><b>问 3：新参数的作用？</b><br>答：<code>invert</code>——滚轮方向取反（滚下变翻上一张）；<code>forceToAxis</code>——锁定按滚轮轴向判断，避免触控板斜向手势误翻；<code>releaseOnEdges</code>——非循环轮播滚到头后放行页面滚动，loop 模式下无效。</p>
+      <p><b>问 4：现场把 delay 改成指定值会怎样？</b><br>答：以 3200 → 1600 为例：<code>autoplay.delay</code> 是每张停留的毫秒数，减半后自动翻页频率提高一倍，大约每 1.6 秒翻一张；<code>speed: 800</code> 的动画时长不变，所以节奏更紧凑；滚轮手动翻页与 delay 无关，不受影响。</p>
+    </div>
+  </div>
+</body>
+</html>

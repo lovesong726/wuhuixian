@@ -210,6 +210,7 @@
       <button data-fx="coverflow">coverflow 画廊堆叠（沉浸）</button>
       <button data-fx="flip">flip 翻页（复古）</button>
       <button data-fx="cards">cards 卡片（俏皮）</button>
+      <button data-fx="creative">creative 电影墙（AI 自学）</button>
     </div>
     <div class="wy-demo">
       <span class="wy-demo-tag">🎛️ 演示四 · 效果实验台（点按钮切换 effect）</span>
@@ -221,6 +222,7 @@
             <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919大飞机"><div class="wy-cap"><h3>C919 大飞机</h3><p>企业官网爱用 fade</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="wy-cap"><h3>奋斗者号</h3><p>游戏网站爱用 cube</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="wy-cap"><h3>中国天眼 FAST</h3><p>相册页面爱用 coverflow</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/aidao_1_1.jpg" alt="爱达·魔都号"><div class="wy-cap"><h3>爱达·魔都号</h3><p>首艘国产大型邮轮 · 2024年1月1日首航（AI 生成图）</p></div></div>
           </div>
           <div class="swiper-pagination" id="wyPag4"></div>
         </div>
@@ -229,6 +231,13 @@
   </div>
 
   <div class="wy-back"><a href="index.html">← 返回课堂实践中心</a>　<a href="swiper-lesson.html">查看教师讲解版 →</a></div>
+
+  <!-- 任务记录入口：课堂抽查提问时打开对应的 AI 对话与答辩记录页 -->
+  <div class="wy-back" id="whx_task_records">📝 AI 提示词与答辩记录（课堂抽查入口）：
+    <a href="whx_task1_prompt.html">任务一 · 提示词工程师</a>　
+    <a href="whx_task2_creative.html">任务二 · creative 仿写</a>　
+    <a href="whx_task3_cruise.html">任务三 · 综合创作（爱达·魔都号 + 滚轮）</a>
+  </div>
 
   <footer>Swiper 课堂操作任务 · 大国重器光影展（学生版） · 高级网页设计 · 2026-2027-1</footer>
 </div>
@@ -284,6 +293,13 @@ var wySw3r = new Swiper("#wySw3", {
       el: "#wyPag4",
       clickable: true,
     },
+    // 任务三加分项：课堂没讲的 mousewheel —— 光标悬停轮播上时滚轮翻页
+    // 注：光标不在轮播上时滚轮照常滚动页面（源码 mouseEntered 判断），不必担心劫持
+    mousewheel: {
+      invert: false,        // 滚轮向下 = 翻下一张（自然方向）
+      forceToAxis: false,   // 不锁定轴向，普通鼠标竖向滚轮即可翻页
+      releaseOnEdges: false,// loop 模式没有"边缘"，此项无效，显式声明防误读
+    },
   });
 
   // ── 任务 4 进阶：补全按钮点击事件，实现六种效果实时切换 ──
@@ -313,6 +329,26 @@ var wySw3r = new Swiper("#wySw3", {
           el: "#wyPag4",
           clickable: true,
         },
+        // creative 电影墙：课堂没讲的第 7 种 effect，参数仿照官方示例 257-effect-creative
+        creativeEffect: {
+          limitProgress: 2,
+          prev: {
+            // 上一张离场：缩小、左移出屏、向左偏转 8 度、渐隐
+            translate: ["-120%", 0, -240],
+            rotate: [0, 0, -8],
+            opacity: 0.3,
+            scale: 0.85,
+          },
+          next: {
+            // 下一张进场：从右侧放大推近、带反向角度、渐显
+            translate: ["120%", 0, -120],
+            rotate: [0, 0, 8],
+            opacity: 0.5,
+            scale: 1.15,
+          },
+        },
+        // 任务三加分项：销毁重建后滚轮控制也要保留
+        mousewheel: { invert: false, forceToAxis: false, releaseOnEdges: false },
       });
 
     });

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-08 | 使用大模型：GLM-5.3-Flash | 功能名称：任务二·creative仿写（第7种effect电影墙的实现与追问记录） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>任务二 · creative 仿写 · 电影墙实现记录</title>
+  <style>
+    :root {
+      --whx-paper: #f3f1ec;
+      --whx-ink: #211e1b;
+      --whx-muted: #6f6a62;
+      --whx-blue: #0e63b6;
+      --whx-red: #e64530;
+      --whx-line: #d8d3c8;
+      --whx-serif: "Noto Serif SC", "Source Han Serif SC", SimSun, serif;
+      --whx-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      --whx-mono: Consolas, "Courier New", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--whx-paper); color: var(--whx-ink); font-family: var(--whx-sans); line-height: 1.75; }
+    .whx_sheet { max-width: 860px; margin: 0 auto; padding: 48px 32px 72px; }
+    .whx_back { display: inline-block; margin-bottom: 24px; color: var(--whx-blue); text-decoration: none; }
+    .whx_back:hover { text-decoration: underline; }
+    h1 { font-family: var(--whx-serif); font-size: 30px; margin: 0 0 6px; }
+    .whx_sub { color: var(--whx-muted); font-size: 14px; margin-bottom: 32px; }
+    .whx_card { background: #fff; border: 1px solid var(--whx-line); border-radius: 6px; padding: 24px 28px; margin-bottom: 24px; }
+    .whx_card h2 { font-family: var(--whx-serif); font-size: 20px; margin: 0 0 12px; padding-left: 10px; border-left: 4px solid var(--whx-blue); }
+    .whx_label { font-size: 13px; color: var(--whx-muted); margin: 14px 0 6px; }
+    .whx_say { background: var(--whx-paper); border: 1px dashed var(--whx-line); border-radius: 4px; padding: 12px 16px; font-size: 15px; }
+    pre { background: #1f1d1a; color: #e8e4db; border-radius: 4px; padding: 14px 16px; font-family: var(--whx-mono); font-size: 13.5px; line-height: 1.6; overflow-x: auto; margin: 8px 0 4px; }
+    .whx_ok { background: #eef6ee; border-left: 4px solid #3e8e41; padding: 10px 14px; margin: 8px 0; font-size: 14.5px; }
+    .whx_note { background: #fdf3e7; border-left: 4px solid var(--whx-red); padding: 10px 14px; margin: 10px 0 4px; font-size: 14.5px; }
+    .whx_shot { margin-top: 6px; font-size: 13px; color: var(--whx-muted); border: 1px dashed var(--whx-line); border-radius: 4px; padding: 10px 14px; }
+  </style>
+</head>
+<body>
+  <div class="whx_sheet">
+    <a class="whx_back" href="index.html">← 返回课堂实践中心</a>
+    <h1>任务二 · creative 仿写</h1>
+    <p class="whx_sub">课堂讲了 6 种 effect，第 7 种 creative（自定义变换）靠 AI 自学 + 官方示例 257-effect-creative.html 读懂 creativeEffect 的 transform 写法，为演示四新增「creative 电影墙」按钮。</p>
+
+    <div class="whx_card">
+      <h2>第一步 · 跟着 AI 读官方示例</h2>
+      <p>我发给 AI 的问题：「Swiper 官方示例 swiper/demo/257-effect-creative.html 里 creativeEffect 的 prev / next 中的 translate、rotate、scale、opacity 分别怎么写？数组的三个数字各是什么意思？」</p>
+      <p>AI 拆解出的写法要点：</p>
+      <pre>creativeEffect: {
+  limitProgress: 2,        // 相邻几张还参与变换（2 = 前后各一张）
+  prev: {                  // "上一张"离开时的样子
+    translate: ["-120%", 0, -240],  // 数组 = [X, Y, Z]
+    rotate: [0, 0, -8],             // 数组 = [绕X轴, 绕Y轴, 绕Z轴]，单位度
+    opacity: 0.3,
+    scale: 0.85,
+  },
+  next: { ... },           // "下一张"进场的样子，写法相同
+}</pre>
+    </div>
+
+    <div class="whx_card">
+      <h2>第二步 · 电影墙参数（已写入 swiper-task.html 第 7 个按钮）</h2>
+      <p>效果要求：上一张<b>缩小、左移并带角度</b>，下一张<b>放大、右移进场</b>——像在电影选片墙上推拉海报：</p>
+      <pre>prev: { translate: ["-120%", 0, -240], rotate: [0, 0, -8], opacity: 0.3, scale: 0.85 },
+next: { translate: ["120%", 0, -120],  rotate: [0, 0,  8], opacity: 0.5, scale: 1.15 },</pre>
+      <div class="whx_ok">验证结论：点「creative 电影墙」按钮，离场卡片缩小左偏 8 度、进场卡片从右侧放大推近，自动翻页与圆点均正常（本地 Swiper 6.8.4 自动化实测通过，截图见下方占位）。</div>
+      <div class="whx_shot">📸 截图占位：请粘贴 swiper-task.html 中点「creative 电影墙」后的切换瞬间截图（能看出左右两卡的倾斜与缩放）。</div>
+    </div>
+
+    <div class="whx_card">
+      <h2>追问 · 用自己的话回答</h2>
+      <p class="whx_label">向 AI 追问：prev / next 的 transform 各控制什么？</p>
+      <div class="whx_say"><b>我的理解：</b>prev 描述的是<b>正在离开的这一张</b>从当前位置变成什么样子——它往哪挪、缩多小、转多少度、透明到什么程度；next 描述的是<b>还没登场的下一张</b>从哪个角落、以什么姿态进入画面。两者合起来就是"一退一进"的整场戏：prev 管"怎么退场"，next 管"怎么登场"。</div>
+    </div>
+
+    <div class="whx_card">
+      <h2>答辩抽问 · 自答</h2>
+      <p><b>问：transform 里的百分号是相对谁的？</b><br>答：相对<b>slide 自身的尺寸</b>——X 方向的百分号按幻灯片的<b>宽度</b>算，Y 方向按<b>高度</b>算。"120%" 就是把自己整个宽度再多挪出去一点，保证完全离开可视区。</p>
+      <p><b>问：改一个数值让卡片转 20 度试试？</b><br>答：把 prev / next 的 <code>rotate</code> 第三个数字从 <code>±8</code> 改成 <code>±20</code>：</p>
+      <pre>prev: { ..., rotate: [0, 0, -20] },
+next: { ..., rotate: [0, 0,  20] },</pre>
+      <div class="whx_ok">实验结论：卡片入场 / 离场的倾斜明显变陡，像把海报在墙上甩了一个更大的角度；其余参数不变，翻页、自动播放不受影响（本地实测 rotateZ ±8 → ±20 生效）。</div>
+      <div class="whx_shot">📸 截图占位：请粘贴 rotate 改为 ±20 后的切换瞬间截图，与 8 度版本对比。</div>
+    </div>
+
+    <div class="whx_note">对比任务一的心得：任务一是"把需求说准"，任务二是"拿 AI 当字典读没讲过的 API"——先让 AI 拆官方示例的语法，再按自己的效果目标拼参数，最后用追问把语法含义转成自己的话。</div>
+  </div>
+</body>
+</html>
