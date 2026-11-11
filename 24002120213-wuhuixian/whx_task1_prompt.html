@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-11 | 使用大模型：Kimi-K3 | 功能名称：任务一提示词与实现效果 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务一 · 提示词工程师 —— 吴慧贤 24002120213</title>
+<!-- 与 swiper-task.html 一致引入 Swiper 11（本地 swiper/ 目录不入库，线上须用 CDN） -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:#f6f8fc;color:#1f2937}
+  .whx_rec_wrap{max-width:1000px;margin:0 auto;padding:40px 20px 60px}
+
+  /* 记录页样式（与 swiper-task.html 中 #whx_records 保持一致） */
+  #whx_records{background:#fff;border-radius:18px;padding:28px 30px;margin-bottom:26px;border:1px solid #e8ecf5;box-shadow:0 4px 14px rgba(31,41,55,.06)}
+  #whx_records .whx_rec_tit{font-size:24px;color:#111827;margin-bottom:6px}
+  #whx_records .whx_rec_lede{font-size:14px;color:#6b7280;line-height:1.9;margin-bottom:18px}
+  #whx_records .whx_rec_sec{background:#fafbfe;border:1px solid #e8ecf5;border-radius:14px;padding:22px 24px;margin-bottom:22px;scroll-margin-top:20px}
+  #whx_records .whx_rec_sec h2{font-size:19px;color:#0f2b5b;margin-bottom:6px}
+  #whx_records .whx_rec_sec h3{font-size:15px;color:#111827;margin:18px 0 8px}
+  #whx_records .whx_rec_sec p{font-size:14px;color:#374151;line-height:1.95;margin-bottom:8px}
+  #whx_records .whx_rec_goal{color:#6b7280;font-size:13.5px;line-height:1.9;margin-bottom:12px}
+  #whx_records code{background:#eef2ff;color:#1d4ed8;padding:1px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:12.5px}
+  #whx_records pre{background:#0f172a;border-radius:10px;padding:14px 16px;overflow:auto;margin:8px 0 12px}
+  #whx_records pre code{background:none;color:#cfe3ff;padding:0;font-size:12.5px;line-height:1.7}
+  #whx_records img{max-width:100%;border-radius:10px;border:1px solid #dbe4f0;margin:6px 0}
+
+  /* 每版提示词的在线效果演示 */
+  #whx_records .whx_rec_demo{margin:12px 0 14px}
+  #whx_records .whx_rec_demo_tag{display:inline-block;font-size:12.5px;color:#0f2b5b;background:#e8f0ff;border:1px solid #c7d8f8;border-radius:999px;padding:4px 14px;margin-bottom:10px}
+  #whx_records .whx_rec_sw{max-width:620px;height:240px;margin:0 auto 10px;border-radius:12px}
+  #whx_records .whx_rec_sw .swiper-slide{position:relative;border-radius:12px;overflow:hidden}
+  #whx_records .whx_rec_sw img{width:100%;height:100%;object-fit:cover;display:block;border:none;border-radius:0;margin:0}
+  #whx_records .whx_rec_cap{position:absolute;left:0;right:0;bottom:0;padding:26px 16px 10px;color:#fff;background:linear-gradient(transparent,rgba(5,15,35,.8))}
+  #whx_records .whx_rec_cap h4{font-size:15px;letter-spacing:1px}
+  #whx_records .whx_rec_cap p{font-size:12px;color:#dbe6f8;margin:2px 0 0}
+  #whx_records .whx_rec_sw .swiper-pagination-bullet{background:#0f2b5b;opacity:.35}
+  #whx_records .whx_rec_sw .swiper-pagination-bullet-active{background:#e8890c;opacity:1;width:20px;border-radius:6px}
+  #whx_records .whx_rec_demo_note{font-size:12.5px;color:#92400e;background:#fffbea;border:1px dashed #fde68a;border-radius:8px;padding:8px 12px;line-height:1.8;max-width:620px;margin:0 auto}
+
+  /* 本页相关提示词记录（摘自 whx_prompt.md） */
+  #whx_records .whx_rec_plog{margin:10px 0 2px;padding:0;list-style:none}
+  #whx_records .whx_rec_plog li{border-left:3px solid #e8890c;background:#fffdf5;border-radius:0 8px 8px 0;padding:8px 14px;margin-bottom:10px;font-size:13px;color:#374151;line-height:1.8}
+  #whx_records .whx_rec_plog .whx_rec_pmeta{display:block;font-size:12px;color:#b45309;font-weight:600;margin-bottom:2px}
+
+  /* 底部返回链接 */
+  .whx_back{display:flex;gap:16px;flex-wrap:wrap}
+  .whx_back a{display:inline-block;padding:10px 20px;border-radius:999px;background:#fff;border:1px solid #e8ecf5;color:#1d5bbf;text-decoration:none;font-size:14px;transition:all .2s}
+  .whx_back a:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,43,91,.15)}
+</style>
+</head>
+<body>
+<div class="whx_rec_wrap">
+
+  <div id="whx_records">
+    <h1 class="whx_rec_tit">任务一 · 提示词工程师</h1>
+    <p class="whx_rec_lede">Swiper 课堂任务一的两版提示词与各自实现效果（吴慧贤 · 24002120213）。</p>
+
+    <section class="whx_rec_sec" id="whx_task1">
+      <p class="whx_rec_goal">目标：让 AI 生成 <code>new Swiper('#wySw4', {...})</code> 配置 —— ① 无缝循环 ② 3.2 秒自动翻页且手动操作后不停止 ③ 圆点分页器可点击 ④ 初始效果 cube。两版提示词与各自跑出来的效果如下。</p>
+
+      <h2>第 1 版提示词（有遗漏）</h2>
+      <p>我发出的提示词：</p>
+      <p>帮我用 Swiper 6 写一个轮播配置：容器是 #wySw4，要能无缝循环播放，每 3.2 秒自动翻一次页，底下要有圆点分页器，切换效果用 cube 立方体。</p>
+      <p>AI 的回答（代码）：</p>
+<pre><code>new Swiper('#wySw4', {
+  loop: true,                 // 无缝循环 ✓
+  autoplay: { delay: 3200 },  // 自动翻页 ✓（但漏了不停止的要求）
+  pagination: { el: '#wyPag4' },  // 圆点 ✓（但不可点击）
+  effect: 'cube',             // 立方体 ✓
+});</code></pre>
+
+      <div class="whx_rec_demo">
+        <p class="whx_rec_demo_tag">▶ 第 1 版实现效果（配置原样跑在本页，可动手试）</p>
+        <div class="swiper whx_rec_sw" id="whx_task1_v1">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="whx_rec_cap"><h4>天宫空间站</h4><p>第 1 版 · 拖一下试试，松手后自动翻页就停了</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组"><div class="whx_rec_cap"><h4>复兴号动车组</h4><p>第 1 版 · 底部圆点点不动，只是指示器</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919大飞机"><div class="whx_rec_cap"><h4>C919 大飞机</h4><p>第 1 版 · 没配 speed，cube 旋转一闪而过</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="whx_rec_cap"><h4>奋斗者号</h4><p>第 1 版 · 循环正常，最后一张能回到第一张</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="whx_rec_cap"><h4>中国天眼 FAST</h4><p>第 1 版 · 四条验收只过了"循环 + cube"两条</p></div></div>
+          </div>
+          <div class="swiper-pagination" id="whx_task1_pag1"></div>
+        </div>
+        <p class="whx_rec_demo_note">👉 动手验证：按住拖动一次再静置——自动翻页<strong>不再继续</strong>（缺 <code>disableOnInteraction: false</code>）；点击下方圆点——<strong>毫无反应</strong>（缺 <code>clickable: true</code>）。这就是第一版提示词"语法对、行为错"的现场。</p>
+      </div>
+
+      <h2>第 2 版提示词（把验收标准逐条写进去）</h2>
+      <p>我发出的提示词：</p>
+      <p>上一版有三个问题。请严格按这四条验收标准重新给 Swiper 6 的 #wySw4 配置：① loop 无缝循环，最后一张往后翻直接回到第一张；② autoplay delay 3200，且必须加 disableOnInteraction: false——人拖动、点圆点之后也要继续自动翻；③ 分页器圆点必须 clickable: true，点第几个圆点跳第几张；④ effect: 'cube' 初始就是立方体，speed 给 800 让旋转看得清。请逐条对照，一条都不能少。</p>
+      <p>AI 的回答（代码）：</p>
+<pre><code>new Swiper('#wySw4', {
+  effect: 'cube',             // ④ 初始立方体 ✓
+  speed: 800,                 // 翻页动画 800ms，旋转看得清 ✓
+  loop: true,                 // ① 无缝循环 ✓
+  autoplay: {
+    delay: 3200,              // ② 每 3.2 秒自动翻页 ✓
+    disableOnInteraction: false,  // ② 手动操作后继续自动翻 ✓
+  },
+  pagination: {
+    el: '#wyPag4',
+    clickable: true,          // ③ 圆点可点击跳转 ✓
+  },
+  grabCursor: true,           // 手型光标，提示可拖动（附加）
+});</code></pre>
+
+      <div class="whx_rec_demo">
+        <p class="whx_rec_demo_tag">▶ 第 2 版实现效果（修正配置原样跑在本页，可对照第 1 版试）</p>
+        <div class="swiper whx_rec_sw" id="whx_task1_v2">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="whx_rec_cap"><h4>天宫空间站</h4><p>第 2 版 · 拖动后松手，3.2 秒照样继续自动翻</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组"><div class="whx_rec_cap"><h4>复兴号动车组</h4><p>第 2 版 · 圆点可点击，点第几个跳第几张</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919大飞机"><div class="whx_rec_cap"><h4>C919 大飞机</h4><p>第 2 版 · speed 800，cube 旋转过程看得清</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="whx_rec_cap"><h4>奋斗者号</h4><p>第 2 版 · 无缝循环，光标悬停变手型</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="whx_rec_cap"><h4>中国天眼 FAST</h4><p>第 2 版 · 四条验收标准全部通过</p></div></div>
+          </div>
+          <div class="swiper-pagination" id="whx_task1_pag2"></div>
+        </div>
+        <p class="whx_rec_demo_note">👉 对照验证：同样拖一次再静置——自动翻页<strong>照常继续</strong>；点击任意圆点——<strong>立即跳转</strong>；立方体旋转约 0.8 秒，过程完整可见。与上面第 1 版对比，差异一目了然。</p>
+      </div>
+
+      <h2>本页相关提示词记录（摘自 whx_prompt.md）</h2>
+      <p>以下是与任务一及本记录页直接相关的历史提示词，按时间顺序排列：</p>
+      <ul class="whx_rec_plog">
+        <li><span class="whx_rec_pmeta">2026-11-08 ｜ GLM-5.3-Flash</span>按任务一完成任务（swiper 提示词工程师：两轮提示词生成 #wySw4 配置：无缝循环/3.2秒自动翻页不停/圆点可点击/初始cube）</li>
+        <li><span class="whx_rec_pmeta">2026-11-08 ｜ GLM-5.3-Flash</span>给提示词留访问入口（把三个任务记录页 whx_task1_prompt / whx_task2_creative / whx_task3_cruise 加入 swiper-task.html 对应任务区和 index.html 目录，方便老师课堂抽查提问）</li>
+        <li><span class="whx_rec_pmeta">2026-11-08 ｜ GLM-5.3-Flash</span>把任务一到三的三个记录页合并为一个html文件（whx_task_records.html，含锚点导航），删除原三个文件，同步更新 index.html 与 swiper-task.html 的入口链接</li>
+        <li><span class="whx_rec_pmeta">2026-11-09 ｜ DeepSeek-V4.1-Flash</span>把whx_task_records.html这个文件的内容挪到swiper-task.html里</li>
+        <li><span class="whx_rec_pmeta">2026-11-11 ｜ Kimi-K3</span>现在就whx_task1_prompt.html修改，每一版提示词下需要展现它的具体实现效果用来展现每版的不同</li>
+        <li><span class="whx_rec_pmeta">2026-11-11 ｜ Kimi-K3</span>现在就whx_task1_prompt.html修改，只保留提示词和实现效果，不要答辩记录</li>
+        <li><span class="whx_rec_pmeta">2026-11-11 ｜ Kimi-K3</span>把whx_prompt.md的提示词内容插到whx_task1_prompt.html里</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="whx_back">
+    <a href="index.html">← 返回课堂实践中心</a>
+    <a href="swiper-task.html">返回 Swiper 任务页 →</a>
+  </div>
+
+</div>
+
+<script>
+  // 第 1 版演示：原样使用 AI 第一版回答的配置（容器与圆点 id 换成本页演示元素），缺陷保留供对照
+  var whxSwV1 = new Swiper('#whx_task1_v1', {
+    loop: true,
+    autoplay: { delay: 3200 },       // 漏 disableOnInteraction: false → 拖动后自动翻页停止
+    pagination: { el: '#whx_task1_pag1' },  // 漏 clickable: true → 圆点不可点击
+    effect: 'cube',                  // 未配 speed，默认 300ms，旋转过快
+  });
+
+  // 第 2 版演示：原样使用 AI 修正版配置，四条验收标准全部生效
+  var whxSwV2 = new Swiper('#whx_task1_v2', {
+    effect: 'cube',
+    speed: 800,
+    loop: true,
+    autoplay: {
+      delay: 3200,
+      disableOnInteraction: false,   // 手动操作后继续自动翻页
+    },
+    pagination: {
+      el: '#whx_task1_pag2',
+      clickable: true,               // 圆点可点击跳转
+    },
+    grabCursor: true,
+  });
+</script>
+</body>
+</html>
