@@ -34,8 +34,6 @@
   #whx_records .whx_rec_cap{position:absolute;left:0;right:0;bottom:0;padding:26px 16px 10px;color:#fff;background:linear-gradient(transparent,rgba(5,15,35,.8))}
   #whx_records .whx_rec_cap h4{font-size:15px;letter-spacing:1px}
   #whx_records .whx_rec_cap p{font-size:12px;color:#dbe6f8;margin:2px 0 0}
-  #whx_records .whx_rec_sw .swiper-pagination-bullet{background:#0f2b5b;opacity:.35}
-  #whx_records .whx_rec_sw .swiper-pagination-bullet-active{background:#e8890c;opacity:1;width:20px;border-radius:6px}
   #whx_records .whx_rec_demo_note{font-size:12.5px;color:#92400e;background:#fffbea;border:1px dashed #fde68a;border-radius:8px;padding:8px 12px;line-height:1.8;max-width:680px;margin:0 auto}
 
   /* 底部返回链接 */
@@ -71,7 +69,6 @@
             <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="whx_rec_cap"><h4>中国天眼 FAST</h4><p>展品 5 / 6 · 循环模式无缝续播</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/aidao_1_1.jpg" alt="爱达·魔都号"><div class="whx_rec_cap"><h4>爱达·魔都号</h4><p>展品 6 / 6 · AI 生成图 · 再往下翻回到第 1 张</p></div></div>
           </div>
-          <div class="swiper-pagination" id="whx_task3_pag"></div>
         </div>
         <p class="whx_rec_demo_note">👉 把光标移到轮播上滚动滚轮：向下滚画面<strong>从下往上</strong>翻出下一张、向上滚<strong>从上往下</strong>翻回上一张；滚到第 6 张「爱达·魔都号」继续下翻会<strong>循环回到第 1 张</strong>；光标移出轮播后，页面滚动立即恢复，不被劫持。</p>
       </div>
@@ -90,7 +87,7 @@
 </div>
 
 <script>
-  // 任务三在线演示：竖向轮播 + 循环 + 3.2 秒自动翻页 + 圆点可点 + mousewheel 滚轮上下翻页
+  // 任务三在线演示：竖向轮播 + 循环 + 3.2 秒自动翻页 + mousewheel 滚轮上下翻页（去掉圆点，纯滚轮操控）
   var whxSwCruise = new Swiper('#whx_task3_cruise', {
     direction: 'vertical',           // 从左右切换改为上下切换
     speed: 800,
@@ -99,10 +96,6 @@
     autoplay: {
       delay: 3200,
       disableOnInteraction: false,   // 手动操作后继续自动翻页
-    },
-    pagination: {
-      el: '#whx_task3_pag',
-      clickable: true,
     },
     // 滚轮翻页：光标悬停轮播时滚轮翻页，移开后页面照常滚动（源码 mouseEntered 判断）
     mousewheel: {
