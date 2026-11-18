@@ -1116,6 +1116,39 @@
       pointer-events: none;
     }
 
+    /* 视频链接输入行 */
+    .whx_video-link {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 460px;
+      margin-top: 2px;
+    }
+
+    .whx_video-link input {
+      flex: 1;
+      min-width: 0;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid #d9d3ff;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--whx_ink);
+      font-family: var(--whx_font);
+      font-size: 12px;
+    }
+
+    .whx_video-link input:focus {
+      outline: none;
+      border-color: var(--whx_accent);
+      box-shadow: 0 0 0 3px rgba(101, 87, 210, 0.12);
+    }
+
+    .whx_video-link .whx_btn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
     .whx_video {
       display: block;
       width: 100%;
@@ -1636,13 +1669,16 @@
         </div>
 
         <div class="whx_video-slot" id="whxVideoSlot">
-          <!-- 永久插入方式：把录屏命名为 mobile-zoom.mp4 放在本文件同目录，
-               给下面的 video 加上 src="mobile-zoom.mp4" 并删除 hidden 即可 -->
-          <video class="whx_video" id="whxZoomVideo" controls playsinline preload="metadata" hidden></video>
+          <!-- 任务三手机录屏已插入：mobile-zoom.mp4；更换视频直接替换同名文件即可 -->
+          <video class="whx_video" id="whxZoomVideo" controls playsinline preload="metadata" src="mobile-zoom.mp4"></video>
 
-          <div class="whx_video-empty" id="whxVideoEmpty">
+          <div class="whx_video-empty" id="whxVideoEmpty" hidden>
             <span class="whx_video-play"></span>
-            <p>把手机录屏命名为 <code>mobile-zoom.mp4</code> 放在本页面同目录，并把下方视频的 <code>src</code> 指过去；也可以先选择本地视频临时预览（不会上传）。</p>
+            <p>把视频链接粘贴到下面输入框，点“播放链接”即可；也可以把录屏命名为 <code>mobile-zoom.mp4</code> 放在本页面同目录，填 <code>mobile-zoom.mp4</code> 即可。选择本地视频只做临时预览（不会上传）。</p>
+            <div class="whx_video-link">
+              <input id="whxVideoUrl" type="url" placeholder="粘贴视频链接，如 https://.../mobile-zoom.mp4" aria-label="任务三视频链接">
+              <button class="whx_btn whx_btn--small" id="whxVideoUrlBtn" type="button">播放链接</button>
+            </div>
             <label class="whx_btn whx_btn--small" for="whxVideoFile">选择本地视频</label>
             <input class="whx_video-input" id="whxVideoFile" type="file" accept="video/*">
           </div>
@@ -1731,13 +1767,16 @@
         </div>
 
         <div class="whx_video-slot">
-          <!-- 永久插入方式：把录屏命名为 mobile-sensor.mp4 放在本文件同目录，
-               给下面的 video 加上 src="mobile-sensor.mp4" 并删除 hidden 即可 -->
-          <video class="whx_video" id="whxSensorVideo" controls playsinline preload="metadata" hidden></video>
+          <!-- 任务四手机录屏已插入：mobile-sensor.mp4；更换视频直接替换同名文件即可 -->
+          <video class="whx_video" id="whxSensorVideo" controls playsinline preload="metadata" src="mobile-sensor.mp4"></video>
 
-          <div class="whx_video-empty" id="whxSensorVideoEmpty">
+          <div class="whx_video-empty" id="whxSensorVideoEmpty" hidden>
             <span class="whx_video-play"></span>
-            <p>把手机录屏命名为 <code>mobile-sensor.mp4</code> 放在本页面同目录，并把下方视频的 <code>src</code> 指过去；也可以先选择本地视频临时预览（不会上传）。</p>
+            <p>把视频链接粘贴到下面输入框，点“播放链接”即可；也可以把录屏命名为 <code>mobile-sensor.mp4</code> 放在本页面同目录，填 <code>mobile-sensor.mp4</code> 即可。选择本地视频只做临时预览（不会上传）。</p>
+            <div class="whx_video-link">
+              <input id="whxSensorVideoUrl" type="url" placeholder="粘贴视频链接，如 https://.../mobile-sensor.mp4" aria-label="任务四视频链接">
+              <button class="whx_btn whx_btn--small" id="whxSensorVideoUrlBtn" type="button">播放链接</button>
+            </div>
             <label class="whx_btn whx_btn--small" for="whxSensorVideoFile">选择本地视频</label>
             <input class="whx_video-input" id="whxSensorVideoFile" type="file" accept="video/*">
           </div>
@@ -2873,15 +2912,41 @@
         whx_startMotion();
       }
 
-      /* 绑定一个视频位：本地选择后临时预览，不会上传 */
-      function whx_bindVideoPicker(videoId, emptyId, inputId) {
+      /* 绑定一个视频位：支持粘贴视频链接或选择本地文件，本地文件不会上传 */
+      function whx_bindVideoPicker(videoId, emptyId, inputId, urlInputId, urlBtnId) {
         var video = document.getElementById(videoId);
         var empty = document.getElementById(emptyId);
         var input = document.getElementById(inputId);
+        var urlInput = document.getElementById(urlInputId);
+        var urlBtn = document.getElementById(urlBtnId);
         var objectURL = null;
 
         if (!video || !empty || !input) {
           return;
+        }
+
+        /* 把视频源换成传入地址并显示播放器 */
+        function whx_showVideo(src) {
+          video.src = src;
+          video.hidden = false;
+          empty.hidden = true;
+          video.load();
+        }
+
+        /* 播放输入框里的视频链接 */
+        function whx_playUrl() {
+          var src = urlInput ? urlInput.value.trim() : '';
+          if (!src) {
+            if (urlInput) {
+              urlInput.focus();
+            }
+            return;
+          }
+          if (objectURL) {
+            URL.revokeObjectURL(objectURL);
+            objectURL = null;
+          }
+          whx_showVideo(src);
         }
 
         input.addEventListener('change', function () {
@@ -2894,17 +2959,24 @@
             URL.revokeObjectURL(objectURL);
           }
           objectURL = URL.createObjectURL(file);
-          video.src = objectURL;
-          video.hidden = false;
-          empty.hidden = true;
-          video.load();
+          whx_showVideo(objectURL);
         });
+
+        if (urlInput && urlBtn) {
+          urlBtn.addEventListener('click', whx_playUrl);
+          urlInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              whx_playUrl();
+            }
+          });
+        }
       }
 
       /* 初始化两个手机测试视频位 */
       function whx_initVideos() {
-        whx_bindVideoPicker('whxZoomVideo', 'whxVideoEmpty', 'whxVideoFile');
-        whx_bindVideoPicker('whxSensorVideo', 'whxSensorVideoEmpty', 'whxSensorVideoFile');
+        whx_bindVideoPicker('whxZoomVideo', 'whxVideoEmpty', 'whxVideoFile', 'whxVideoUrl', 'whxVideoUrlBtn');
+        whx_bindVideoPicker('whxSensorVideo', 'whxSensorVideoEmpty', 'whxSensorVideoFile', 'whxSensorVideoUrl', 'whxSensorVideoUrlBtn');
       }
 
       /* 页面初始化：绑定事件、刷新计数、绘制空轨迹、绑定按钮 */
