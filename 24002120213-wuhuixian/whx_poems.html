@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 建立时间：2026-11-13 | 使用大模型：Kimi-K3.1-Pro | 功能名称：诗歌数据上图下文展示 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗画集 · 吴慧贤</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      color: #26332d;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: #f4f1e9;
+    }
+    .whx_page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 50px; }
+    .whx_topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 42px; }
+    .whx_brand { color: #315f4b; font-family: "STKaiti", "KaiTi", serif; font-size: 24px; font-weight: bold; letter-spacing: 5px; }
+    .whx_back { color: #52645a; font-size: 14px; text-decoration: none; border-bottom: 1px solid #a8b4ac; padding-bottom: 4px; }
+    .whx_back:hover { color: #1f6d4e; border-color: #1f6d4e; }
+    .whx_hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .whx_kicker { color: #8b6f47; font-size: 12px; letter-spacing: 3px; margin-bottom: 10px; }
+    .whx_hero h1 { font-family: "STKaiti", "KaiTi", serif; font-size: clamp(38px, 6vw, 62px); font-weight: normal; letter-spacing: 8px; }
+    .whx_hero p { max-width: 360px; color: #738077; font-size: 14px; line-height: 1.9; }
+    .whx_tools { display: flex; gap: 12px; margin-bottom: 22px; }
+    .whx_search { flex: 1; min-width: 0; padding: 13px 17px; color: #26332d; font: inherit; font-size: 14px; background: #fff; border: 1px solid #d8d4c8; border-radius: 4px; outline: none; }
+    .whx_search:focus { border-color: #315f4b; box-shadow: 0 0 0 3px rgba(49, 95, 75, .1); }
+    .whx_sort_button { padding: 0 20px; color: #fff; font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer; background: #315f4b; border: 1px solid #315f4b; border-radius: 4px; }
+    .whx_sort_button:hover { background: #234b39; }
+    .whx_status { color: #7b867f; font-size: 14px; padding: 30px 0; text-align: center; }
+    .whx_poem_grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+    .whx_poem_card { overflow: hidden; background: #fff; border: 1px solid #e2ded3; border-radius: 4px; box-shadow: 0 10px 28px rgba(55, 65, 57, .07); transition: transform .25s, box-shadow .25s; }
+    .whx_poem_card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(55, 65, 57, .12); }
+    .whx_poem_image { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+    .whx_poem_body { padding: 22px 20px 25px; border-top: 3px solid #315f4b; }
+    .whx_poem_title { margin-bottom: 13px; color: #263d31; font-family: "STKaiti", "KaiTi", serif; font-size: 24px; font-weight: bold; }
+    .whx_poem_content { color: #657069; font-size: 14px; line-height: 2; }
+    .whx_footer { margin-top: 38px; color: #8a938d; font-size: 12px; text-align: center; letter-spacing: 1px; }
+    @media (max-width: 900px) { .whx_poem_grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) {
+      .whx_page { width: min(100% - 28px, 420px); padding-top: 24px; }
+      .whx_hero { display: block; }
+      .whx_hero p { margin-top: 16px; }
+      .whx_poem_grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="whx_page">
+    <nav class="whx_topbar" aria-label="页面导航">
+      <span class="whx_brand">诗画集</span>
+      <a class="whx_back" href="index.html">← 返回课堂实践中心</a>
+    </nav>
+    <header class="whx_hero">
+      <div>
+        <p class="whx_kicker">POEMS · LOCAL DATA</p>
+        <h1>一诗一画</h1>
+      </div>
+      <p>图片与诗文来自本地 Express 数据服务器，通过接口读取 db.json 中的 poems 数据。</p>
+    </header>
+    <div class="whx_tools">
+      <input class="whx_search" id="whx_search_input" type="search" placeholder="输入标题或诗文关键字" aria-label="搜索诗词">
+      <button class="whx_sort_button" id="whx_sort_button" type="button">按标题长度排序</button>
+    </div>
+    <p class="whx_status" id="whx_status">正在读取诗歌数据…</p>
+    <section class="whx_poem_grid" id="whx_poem_grid" aria-label="诗歌列表"></section>
+    <footer class="whx_footer">吴慧贤 · 高级网页设计课堂实践</footer>
+  </main>
+  <script>
+    // 根据一条诗歌数据创建上图下文的卡片
+    function whxCreatePoemCard(whxPoem) {
+      const whxCard = document.createElement('article');
+      const whxImage = document.createElement('img');
+      const whxBody = document.createElement('div');
+      const whxTitle = document.createElement('h2');
+      const whxContent = document.createElement('p');
+
+      whxCard.className = 'whx_poem_card';
+      whxImage.className = 'whx_poem_image';
+      whxImage.src = `http://localhost:3004/api/poem-image?url=${encodeURIComponent(whxPoem.pic)}`;
+      whxImage.alt = whxPoem.title;
+      whxImage.loading = 'lazy';
+      whxBody.className = 'whx_poem_body';
+      whxTitle.className = 'whx_poem_title';
+      whxTitle.textContent = whxPoem.title;
+      whxContent.className = 'whx_poem_content';
+      whxContent.textContent = whxPoem.content;
+
+      whxBody.append(whxTitle, whxContent);
+      whxCard.append(whxImage, whxBody);
+      return whxCard;
+    }
+
+    let whxPoemsCache = [];
+
+    // 根据搜索关键字筛选缓存数据并重新渲染诗歌卡片
+    function whxRenderPoems() {
+      const whxStatus = document.getElementById('whx_status');
+      const whxGrid = document.getElementById('whx_poem_grid');
+      const whxKeyword = document.getElementById('whx_search_input').value.trim().toLowerCase();
+      const whxFilteredPoems = whxPoemsCache.filter(function (whxPoem) {
+        return whxPoem.title.toLowerCase().includes(whxKeyword) || whxPoem.content.toLowerCase().includes(whxKeyword);
+      });
+      whxGrid.replaceChildren(...whxFilteredPoems.map(whxCreatePoemCard));
+      whxStatus.textContent = whxFilteredPoems.length ? '' : '没有找到匹配的诗词';
+    }
+
+    // 比较两首诗歌的标题长度，用于从短到长排序
+    function whxCompareTitleLength(whxFirst, whxSecond) {
+      return whxFirst.title.length - whxSecond.title.length;
+    }
+
+    // 按标题长度对缓存诗歌排序并保持当前搜索条件
+    function whxSortPoemsByTitle() {
+      whxPoemsCache.sort(whxCompareTitleLength);
+      whxRenderPoems();
+    }
+
+    // 从本地服务器获取一次 poems，后续交互均使用缓存数据
+    async function whxLoadPoems() {
+      const whxStatus = document.getElementById('whx_status');
+      try {
+        const whxResponse = await fetch('http://localhost:3004/api/poems');
+        if (!whxResponse.ok) throw new Error('诗歌接口请求失败');
+        const whxPoems = await whxResponse.json();
+        if (!Array.isArray(whxPoems)) throw new Error('诗歌数据格式不正确');
+        whxPoemsCache = whxPoems;
+        whxRenderPoems();
+      } catch (whxError) {
+        whxStatus.textContent = '数据加载失败，请先运行 node db/server.js，再通过 3004 端口访问本页。';
+      }
+    }
+
+    document.getElementById('whx_search_input').addEventListener('input', whxRenderPoems);
+    document.getElementById('whx_sort_button').addEventListener('click', whxSortPoemsByTitle);
+    whxLoadPoems();
+  </script>
+</body>
+</html>

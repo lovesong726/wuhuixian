@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 学号：24002120213 | 建立时间：2026-11-18 | 使用大模型：DeepSeek-V4.1-Flash | 功能名称：移动端触摸事件课堂实践（四个任务：事件侦探、手势卡片、图片查看器、摇一摇彩蛋，均已实现） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17122b">
+  <title>移动端触摸事件 · 四个任务 | 吴慧贤</title>
+  <style>
+    :root {
+      --whx_bg: #f2f3fa;
+      --whx_card: #ffffff;
+      --whx_ink: #1a1a2b;
+      --whx_muted: #6c6f88;
+      --whx_line: #e2e4ef;
+      --whx_accent: #6557d2;
+      --whx_accent-soft: #efedff;
+      --whx_dark: #121020;
+      --whx_green: #1f9d74;
+      --whx_green-soft: #e6f7f0;
+      --whx_orange: #d98324;
+      --whx_orange-soft: #fff4e6;
+      --whx_red: #dc4d5c;
+      --whx_red-soft: #ffecee;
+      --whx_blue: #2f7fd1;
+      --whx_blue-soft: #e9f2ff;
+      --whx_shadow: 0 18px 46px rgba(31, 27, 70, 0.08);
+      --whx_font: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+      --whx_mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--whx_bg);
+      color: var(--whx_ink);
+      font-family: var(--whx_font);
+      line-height: 1.7;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    h1, h2, h3, h4, p {
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    code {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--whx_accent-soft);
+      color: #4b3fb5;
+      font-family: var(--whx_mono);
+      font-size: 0.92em;
+    }
+
+    /* ===== 顶部主视觉 ===== */
+    .whx_hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 18px 30px;
+      background:
+        radial-gradient(circle at 82% 12%, rgba(139, 127, 240, 0.35), transparent 42%),
+        radial-gradient(circle at 8% 88%, rgba(46, 190, 150, 0.20), transparent 40%),
+        linear-gradient(140deg, #17122b 0%, #221a3f 55%, #2a2050 100%);
+      color: #fff;
+      border-radius: 0 0 28px 28px;
+    }
+
+    .whx_hero::before,
+    .whx_hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+
+    .whx_hero::before {
+      width: 220px;
+      height: 220px;
+      right: -70px;
+      top: -80px;
+    }
+
+    .whx_hero::after {
+      width: 150px;
+      height: 150px;
+      right: -10px;
+      bottom: -90px;
+    }
+
+    .whx_hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .whx_kicker {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.62);
+      text-transform: uppercase;
+    }
+
+    .whx_hero h1 {
+      margin: 12px 0 12px;
+      font-size: clamp(30px, 8vw, 44px);
+      line-height: 1.25;
+      letter-spacing: 1px;
+    }
+
+    .whx_hero-desc {
+      max-width: 560px;
+      font-size: 13.5px;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    .whx_hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .whx_hero-tag {
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .whx_hero-tag.is-strong {
+      border-color: rgba(94, 227, 176, 0.45);
+      background: rgba(94, 227, 176, 0.14);
+      color: #9ff0cf;
+    }
+
+    /* ===== 任务导航 ===== */
+    .whx_nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding: 10px 14px;
+      background: rgba(242, 243, 250, 0.9);
+      border-bottom: 1px solid var(--whx_line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .whx_nav-inner {
+      display: flex;
+      gap: 8px;
+      max-width: 820px;
+      margin: 0 auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .whx_nav-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .whx_tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: 0 0 auto;
+      padding: 8px 13px;
+      border: 1px solid var(--whx_line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--whx_muted);
+      font-size: 12.5px;
+      white-space: nowrap;
+      transition: 0.2s ease;
+    }
+
+    .whx_tab b {
+      color: var(--whx_ink);
+      font-size: 12px;
+    }
+
+    .whx_tab.is-active {
+      border-color: var(--whx_ink);
+      background: var(--whx_ink);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .whx_tab.is-active b {
+      color: #fff;
+    }
+
+    .whx_dot-status {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #cfd3e2;
+    }
+
+    .whx_dot-status.is-done {
+      background: #35c48d;
+      box-shadow: 0 0 0 3px rgba(53, 196, 141, 0.18);
+    }
+
+    /* ===== 主体 ===== */
+    .whx_main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 22px 16px 56px;
+    }
+
+    .whx_task {
+      scroll-margin-top: 72px;
+      margin-bottom: 40px;
+    }
+
+    .whx_task-head {
+      margin-bottom: 16px;
+    }
+
+    .whx_task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .whx_star {
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #6c5ce7, #8f7bff);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 18px rgba(108, 92, 231, 0.28);
+    }
+
+    .whx_dim {
+      padding: 4px 9px;
+      border: 1px solid var(--whx_line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--whx_muted);
+      font-size: 11px;
+    }
+
+    .whx_task h2 {
+      font-size: clamp(22px, 5.6vw, 30px);
+      line-height: 1.35;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== 任务要求卡 ===== */
+    .whx_reqs {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .whx_req {
+      display: flex;
+      gap: 10px;
+      padding: 13px 14px;
+      border: 1px solid var(--whx_line);
+      border-radius: 14px;
+      background: #fff;
+      font-size: 13px;
+      line-height: 1.85;
+      color: #3d4055;
+    }
+
+    .whx_chip {
+      flex: 0 0 auto;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 22px;
+      letter-spacing: 1px;
+    }
+
+    .whx_req--task {
+      border-color: #ffe0bb;
+      background: #fffdf8;
+    }
+
+    .whx_req--task .whx_chip {
+      background: var(--whx_orange-soft);
+      color: #a25a00;
+    }
+
+    .whx_req--check {
+      border-color: #cfe3ff;
+      background: #fbfdff;
+    }
+
+    .whx_req--check .whx_chip {
+      background: var(--whx_blue-soft);
+      color: #1c5fae;
+    }
+
+    .whx_req--bonus {
+      border-color: #c8eedd;
+      background: #fbfffd;
+    }
+
+    .whx_req--bonus .whx_chip {
+      background: var(--whx_green-soft);
+      color: #14734f;
+    }
+
+    /* ===== 通用卡片 ===== */
+    .whx_card {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid var(--whx_line);
+      border-radius: 22px;
+      background: var(--whx_card);
+      box-shadow: var(--whx_shadow);
+    }
+
+    .whx_card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .whx_card-head h3 {
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_card-head p {
+      margin-top: 3px;
+      color: var(--whx_muted);
+      font-size: 11.5px;
+      line-height: 1.6;
+    }
+
+    .whx_badge {
+      flex: 0 0 auto;
+      padding: 4px 9px;
+      border: 1px solid #d9d3ff;
+      border-radius: 6px;
+      background: var(--whx_accent-soft);
+      color: var(--whx_accent);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_state {
+      flex: 0 0 auto;
+      padding: 5px 10px;
+      border: 1px solid var(--whx_line);
+      border-radius: 999px;
+      background: #f7f8fc;
+      color: var(--whx_muted);
+      font-size: 11px;
+      transition: 0.2s ease;
+    }
+
+    .whx_state.is-active {
+      border-color: rgba(53, 196, 141, 0.4);
+      background: var(--whx_green-soft);
+      color: #14734f;
+    }
+
+    /* ===== 事件探针 ===== */
+    .whx_pad {
+      position: relative;
+      height: 230px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      background-color: #121020;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 22% 18%, rgba(124, 92, 255, 0.24), transparent 46%),
+        radial-gradient(circle at 82% 86%, rgba(46, 190, 150, 0.14), transparent 42%);
+      background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%;
+      color: #fff;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .whx_pad.is-active {
+      border-color: rgba(139, 127, 240, 0.7);
+      box-shadow: inset 0 0 46px rgba(124, 92, 255, 0.22);
+    }
+
+    .whx_pad-hint {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 13px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+
+    .whx_pad.is-active .whx_pad-hint {
+      opacity: 0;
+    }
+
+    .whx_pad-corner {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      color: rgba(255, 255, 255, 0.26);
+      font-family: var(--whx_mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_pad-live {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.66);
+      font-family: var(--whx_mono);
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+
+    .whx_dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 26px;
+      height: 26px;
+      margin: -13px 0 0 -13px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(94, 227, 176, 0.95), rgba(94, 227, 176, 0.12) 62%, transparent 70%);
+      box-shadow: 0 0 18px rgba(94, 227, 176, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .whx_counters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .whx_counter {
+      padding: 8px 4px 7px;
+      border: 1px solid var(--whx_line);
+      border-radius: 10px;
+      background: #fafbff;
+      text-align: center;
+    }
+
+    .whx_counter b {
+      display: block;
+      font-family: var(--whx_mono);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .whx_counter span {
+      display: block;
+      color: var(--whx_muted);
+      font-size: 9px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    .whx_counter[data-key="start"] b { color: #1f9d74; }
+    .whx_counter[data-key="move"] b { color: #2f7fd1; }
+    .whx_counter[data-key="end"] b { color: #d98324; }
+    .whx_counter[data-key="cancel"] b { color: #dc4d5c; }
+    .whx_counter[data-key="click"] b { color: #6557d2; }
+
+    .whx_summary {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .whx_sum-item {
+      padding: 7px 6px;
+      border-radius: 10px;
+      background: #f7f8fd;
+      text-align: center;
+    }
+
+    .whx_sum-item span {
+      display: block;
+      color: var(--whx_muted);
+      font-size: 9.5px;
+    }
+
+    .whx_sum-item b {
+      display: block;
+      margin-top: 2px;
+      font-family: var(--whx_mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #33344a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .whx_log {
+      height: 186px;
+      margin-top: 10px;
+      padding: 9px 11px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      background: #0f0d18;
+      color: #d9d6ea;
+      font-family: var(--whx_mono);
+      font-size: 11px;
+      line-height: 1.95;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .whx_log-empty {
+      padding-top: 66px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.34);
+      letter-spacing: 1px;
+      font-family: var(--whx_font);
+      font-size: 12px;
+    }
+
+    .whx_log-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 8px;
+      padding: 1px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.045);
+    }
+
+    .whx_log-idx {
+      min-width: 30px;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 10px;
+    }
+
+    .whx_log-time {
+      min-width: 56px;
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 10px;
+    }
+
+    .whx_log-ev {
+      min-width: 84px;
+      padding: 0 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .whx_ev-touchstart { background: rgba(94, 227, 176, 0.14); color: #5ee3b0; }
+    .whx_ev-touchmove { background: rgba(127, 182, 255, 0.14); color: #7fb6ff; }
+    .whx_ev-touchend { background: rgba(255, 179, 92, 0.14); color: #ffb35c; }
+    .whx_ev-touchcancel { background: rgba(255, 125, 136, 0.14); color: #ff7d88; }
+    .whx_ev-click { background: rgba(195, 181, 255, 0.14); color: #c3b5ff; }
+
+    .whx_log-meta {
+      color: rgba(255, 255, 255, 0.46);
+      font-size: 10px;
+    }
+
+    .whx_toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 11px;
+    }
+
+    .whx_btn {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      border: 1px solid var(--whx_line);
+      border-radius: 999px;
+      background: #fff;
+      color: #3d4055;
+      font-family: var(--whx_font);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .whx_btn:hover {
+      border-color: #c9c2f5;
+      background: #faf9ff;
+    }
+
+    .whx_btn:active {
+      transform: scale(0.97);
+    }
+
+    .whx_btn--small {
+      padding: 6px 12px;
+      font-size: 11.5px;
+    }
+
+    .whx_tip {
+      flex: 1 1 200px;
+      color: var(--whx_muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    /* ===== 记录表 ===== */
+    .whx_table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--whx_line);
+      border-radius: 14px;
+    }
+
+    .whx_table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .whx_table thead th {
+      padding: 9px 11px;
+      background: #f7f8fd;
+      color: var(--whx_muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .whx_table tbody th {
+      width: 88px;
+      padding: 11px;
+      border-top: 1px solid var(--whx_line);
+      color: #33344a;
+      font-size: 12px;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+      background: #fcfcfe;
+    }
+
+    .whx_table td {
+      padding: 11px;
+      border-top: 1px solid var(--whx_line);
+      color: var(--whx_muted);
+      vertical-align: top;
+      word-break: break-word;
+      cursor: text;
+    }
+
+    .whx_table td:focus {
+      outline: 2px solid rgba(101, 87, 210, 0.3);
+      outline-offset: -2px;
+      background: #fbfaff;
+    }
+
+    .whx_cell-seq {
+      color: #33344a;
+      font-family: var(--whx_mono);
+      font-size: 11.5px;
+      line-height: 1.7;
+    }
+
+    .whx_cell-meta {
+      margin-top: 3px;
+      color: #8b8fa8;
+      font-size: 10.5px;
+    }
+
+    .whx_note {
+      margin-top: 10px;
+      color: var(--whx_muted);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+
+    /* ===== 轨迹草图 ===== */
+    .whx_trace {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      background: var(--whx_dark);
+    }
+
+    /* ===== 验收答案 ===== */
+    .whx_answers {
+      margin-top: 30px;
+    }
+
+    .whx_answers > h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_answer {
+      position: relative;
+      margin-top: 10px;
+      padding: 16px 16px 15px 52px;
+      border: 1px solid var(--whx_line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 10px 26px rgba(31, 27, 70, 0.05);
+    }
+
+    .whx_answer-no {
+      position: absolute;
+      left: 14px;
+      top: 16px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6c5ce7, #9a8cff);
+      color: #fff;
+      font-family: var(--whx_mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 26px;
+      text-align: center;
+    }
+
+    .whx_answer h4 {
+      margin-bottom: 7px;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .whx_answer p {
+      color: #565a72;
+      font-size: 12.5px;
+      line-height: 1.9;
+    }
+
+    .whx_answer p + p {
+      margin-top: 5px;
+    }
+
+    /* ===== 任务二 手势卡片 ===== */
+    .whx_done {
+      padding: 4px 9px;
+      border: 1px solid #c8eedd;
+      border-radius: 6px;
+      background: var(--whx_green-soft);
+      color: #14734f;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_gesture-arrows {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .whx_swipe {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      cursor: grab;
+    }
+
+    .whx_swipe:active {
+      cursor: grabbing;
+    }
+
+    .whx_track {
+      display: flex;
+      will-change: transform;
+    }
+
+    .whx_slide {
+      position: relative;
+      flex: 0 0 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 252px;
+      padding: 18px 18px 20px;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .whx_slide::after {
+      content: "";
+      position: absolute;
+      right: -52px;
+      top: -74px;
+      width: 176px;
+      height: 176px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .whx_slide--1 {
+      background: linear-gradient(140deg, #c0392b, #e26a3a 58%, #f2a45c);
+    }
+
+    .whx_slide--2 {
+      background: linear-gradient(140deg, #115e6e, #1f8f8a 58%, #5fc0a0);
+    }
+
+    .whx_slide--3 {
+      background: linear-gradient(140deg, #7d1626, #b32d2a 55%, #dd5b26);
+    }
+
+    .whx_slide--4 {
+      background: linear-gradient(140deg, #5c3112, #99501d 58%, #cf8a43);
+    }
+
+    .whx_slide-no {
+      position: absolute;
+      right: 16px;
+      top: 14px;
+      color: rgba(255, 255, 255, 0.72);
+      font-family: var(--whx_mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .whx_slide-word {
+      position: absolute;
+      right: -8px;
+      bottom: -30px;
+      color: rgba(255, 255, 255, 0.11);
+      font-size: 150px;
+      font-weight: 800;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .whx_slide-body {
+      position: relative;
+      z-index: 1;
+      max-width: 88%;
+    }
+
+    .whx_slide-tag {
+      display: inline-block;
+      padding: 4px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      font-size: 10.5px;
+      letter-spacing: 1px;
+    }
+
+    .whx_slide h4 {
+      margin: 10px 0 8px;
+      font-size: clamp(22px, 6vw, 30px);
+      letter-spacing: 1px;
+    }
+
+    .whx_slide p {
+      font-size: 12.5px;
+      line-height: 1.85;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .whx_toast {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(10, 8, 20, 0.74);
+      color: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 8px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .whx_toast.is-show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .whx_swipe-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .whx_page {
+      color: #33344a;
+      font-family: var(--whx_mono);
+      font-size: 12px;
+    }
+
+    .whx_dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .whx_dots i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d5d8e6;
+      transition: 0.2s ease;
+    }
+
+    .whx_dots i.is-on {
+      width: 18px;
+      border-radius: 4px;
+      background: var(--whx_accent);
+    }
+
+    /* ===== 任务三 图片查看器 ===== */
+    .whx_zoom-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 5px;
+    }
+
+    .whx_zoom {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #0e0c17;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      cursor: grab;
+    }
+
+    .whx_zoom:active {
+      cursor: grabbing;
+    }
+
+    .whx_zoom-img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform-origin: 0 0;
+      will-change: transform;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .whx_zoom-badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(10, 8, 20, 0.62);
+      color: #fff;
+      font-family: var(--whx_mono);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .whx_zoom-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(10, 8, 20, 0.62);
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 11px;
+      white-space: nowrap;
+      pointer-events: none;
+      transform: translateX(-50%);
+      transition: opacity 0.25s ease;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .whx_zoom-hint.is-hidden {
+      opacity: 0;
+    }
+
+    .whx_zoom-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .whx_zoom-note {
+      flex: 1 1 220px;
+      color: var(--whx_muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    /* ===== 任务三 手机测试视频位 ===== */
+    .whx_video-slot {
+      position: relative;
+      overflow: hidden;
+      border: 1px dashed #cfc9ef;
+      border-radius: 16px;
+      background: #faf9ff;
+    }
+
+    .whx_video-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 190px;
+      padding: 22px 18px;
+      text-align: center;
+    }
+
+    .whx_video-empty[hidden] {
+      display: none;
+    }
+
+    .whx_video-play {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid #d9d3ff;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(101, 87, 210, 0.12);
+    }
+
+    .whx_video-play::before {
+      content: "";
+      width: 0;
+      height: 0;
+      margin-left: 3px;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 11px solid var(--whx_accent);
+    }
+
+    .whx_video-empty p {
+      max-width: 460px;
+      color: var(--whx_muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .whx_video-empty label.whx_btn {
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .whx_video-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .whx_video {
+      display: block;
+      width: 100%;
+      max-height: 430px;
+      background: #0e0c17;
+    }
+
+    .whx_video[hidden] {
+      display: none;
+    }
+
+    /* ===== 答辩要点 ===== */
+    .whx_steps {
+      margin: 4px 0 0;
+      padding-left: 20px;
+      color: #565a72;
+      font-size: 12.5px;
+      line-height: 1.9;
+    }
+
+    .whx_steps li {
+      margin: 4px 0;
+    }
+
+    /* ===== 任务四 摇一摇 ===== */
+    .whx_state.is-warn {
+      border-color: #f0d1a8;
+      background: var(--whx_orange-soft);
+      color: #a25a00;
+    }
+
+    .whx_sensor {
+      position: relative;
+      overflow: hidden;
+      padding: 26px 18px 22px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 82% 8%, rgba(255, 178, 92, 0.28), transparent 44%),
+        radial-gradient(circle at 12% 92%, rgba(124, 92, 255, 0.24), transparent 42%),
+        linear-gradient(150deg, #201a2e, #2c2047 62%, #35244f);
+      color: #fff;
+      text-align: center;
+    }
+
+    .whx_sensor::before {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -80px;
+      width: 200px;
+      height: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+    }
+
+    .whx_sensor-kicker {
+      position: relative;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: var(--whx_mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .whx_sensor-title {
+      position: relative;
+      margin-top: 7px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .whx_sensor-result {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 96px;
+      margin: 14px 0 4px;
+    }
+
+    .whx_sensor-result.is-pop {
+      animation: whx_dish_pop 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+
+    .whx_sensor-dish {
+      display: block;
+      font-size: clamp(26px, 7vw, 36px);
+      font-weight: 800;
+      letter-spacing: 2px;
+      line-height: 1.35;
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .whx_sensor-desc {
+      display: block;
+      max-width: 420px;
+      margin-top: 7px;
+      color: rgba(255, 255, 255, 0.64);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .whx_sensor-actions {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .whx_sensor-actions .whx_btn {
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .whx_sensor-actions .whx_btn:hover {
+      border-color: rgba(255, 255, 255, 0.36);
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .whx_sensor-live {
+      position: relative;
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.46);
+      font-family: var(--whx_mono);
+      font-size: 10.5px;
+      letter-spacing: 0.3px;
+    }
+
+    .whx_sensor-tip {
+      margin-top: 10px;
+      color: var(--whx_muted);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+
+    @keyframes whx_dish_pop {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.82);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(0) scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ===== 页脚 ===== */
+    .whx_footer {
+      padding: 22px 16px 34px;
+      border-top: 1px solid var(--whx_line);
+      color: var(--whx_muted);
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.9;
+    }
+
+    .whx_footer a {
+      color: var(--whx_accent);
+      font-weight: 700;
+    }
+
+    @media (min-width: 720px) {
+      .whx_hero {
+        padding: 46px 24px 40px;
+        border-radius: 0 0 34px 34px;
+      }
+
+      .whx_pad {
+        height: 260px;
+      }
+
+      .whx_log {
+        height: 220px;
+      }
+
+      .whx_card {
+        padding: 20px;
+      }
+
+      .whx_counter span,
+      .whx_sum-item span {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="whx_hero">
+    <div class="whx_hero-inner">
+      <p class="whx_kicker">移动端 · 触摸交互 / 课堂实践</p>
+      <h1>按下 · 滑动 · 缩放</h1>
+      <p class="whx_hero-desc">
+        四个递进任务：观察记录、手势实现、综合交互、设备能力。任务一看清触摸事件顺序，
+        任务二左右滑动美食卡片，任务三双指缩放看大图，任务四摇一摇抽今日菜谱。
+      </p>
+      <div class="whx_hero-tags">
+        <span class="whx_hero-tag">建议用手机打开</span>
+        <span class="whx_hero-tag">DevTools 设备模式可体验单指</span>
+        <span class="whx_hero-tag is-strong">进度 4 / 4</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="whx_nav" aria-label="任务导航">
+    <div class="whx_nav-inner">
+      <a class="whx_tab is-active" href="#whxTask1"><b>任务一</b>事件侦探<span class="whx_dot-status is-done"></span></a>
+      <a class="whx_tab" href="#whxTask2"><b>任务二</b>手势卡片<span class="whx_dot-status is-done"></span></a>
+      <a class="whx_tab" href="#whxTask3"><b>任务三</b>图片查看器<span class="whx_dot-status is-done"></span></a>
+      <a class="whx_tab" href="#whxTask4"><b>任务四</b>摇一摇彩蛋<span class="whx_dot-status is-done"></span></a>
+    </div>
+  </nav>
+
+  <main class="whx_main">
+
+    <!-- ================= 任务一 ================= -->
+    <section class="whx_task" id="whxTask1">
+      <div class="whx_task-head">
+        <div class="whx_task-meta">
+          <span class="whx_star">任务一</span>
+          <span class="whx_dim">维度：观察 · 记录 · 不写代码</span>
+        </div>
+        <h2>事件侦探：一次拖动到底发生了什么</h2>
+      </div>
+
+      <div class="whx_reqs">
+        <div class="whx_req whx_req--task">
+          <span class="whx_chip">任务</span>
+          <p>用手机（或 DevTools 设备模式）打开本页，对下方“事件探针”区依次做 5 种操作，把事件触发顺序记录到下表：单击 / 向上拖动 / 向左快速滑 / 双指触摸（可选）/ 长按后抬起。</p>
+        </div>
+        <div class="whx_req whx_req--check">
+          <span class="whx_chip">验收</span>
+          <p>能回答三个问题：① 一次拖动里 <code>touchmove</code> 大约触发多少次、和距离有什么关系？② <code>click</code> 出现在 <code>touchend</code> 之前还是之后？③ 如果把 <code>touchend</code> 换成 <code>touchcancel</code>，会发生什么？</p>
+        </div>
+        <div class="whx_req whx_req--bonus">
+          <span class="whx_chip">加分</span>
+          <p>把日志里的坐标做成一张“轨迹草图”（手绘即可），说明手指的实际路径。本页会把日志坐标自动连成轨迹，见下方“加分项”。</p>
+        </div>
+      </div>
+
+      <!-- 探针 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>事件探针</h3>
+            <p>第 3 节探针区 · 实时日志 · 含 touchcancel 监听</p>
+          </div>
+          <span class="whx_state" id="whxState">等待触摸</span>
+        </div>
+
+        <div class="whx_pad" id="whxPad">
+          <span class="whx_pad-hint">用手指在这里按下、拖动、抬起</span>
+          <span class="whx_pad-corner">touch-action: none</span>
+          <span class="whx_dot" id="whxDot"></span>
+          <div class="whx_pad-live" id="whxLive">手指 0 · x — · y — · 位移 0px</div>
+        </div>
+
+        <div class="whx_counters">
+          <div class="whx_counter" data-key="start"><b>0</b><span>touchstart</span></div>
+          <div class="whx_counter" data-key="move"><b>0</b><span>touchmove</span></div>
+          <div class="whx_counter" data-key="end"><b>0</b><span>touchend</span></div>
+          <div class="whx_counter" data-key="cancel"><b>0</b><span>touchcancel</span></div>
+          <div class="whx_counter" data-key="click"><b>0</b><span>click</span></div>
+        </div>
+
+        <div class="whx_summary">
+          <div class="whx_sum-item"><span>手势类型</span><b id="whxLastType">—</b></div>
+          <div class="whx_sum-item"><span>move 次数</span><b id="whxLastMoves">—</b></div>
+          <div class="whx_sum-item"><span>位移</span><b id="whxLastDist">—</b></div>
+          <div class="whx_sum-item"><span>用时</span><b id="whxLastTime">—</b></div>
+          <div class="whx_sum-item"><span>平均速度</span><b id="whxLastSpeed">—</b></div>
+        </div>
+
+        <div class="whx_log" id="whxLog">
+          <div class="whx_log-empty">等待你的第一次触摸……</div>
+        </div>
+
+        <div class="whx_toolbar">
+          <button class="whx_btn" id="whxClearLog" type="button">清空日志与计数</button>
+          <span class="whx_tip" id="whxTip">做一次操作后，记录表对应行会自动填入实测顺序。</span>
+        </div>
+      </section>
+
+      <!-- 记录表 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>事件顺序记录表</h3>
+            <p>真实操作一次，表格自动填入；单元格也可以点开手动补充</p>
+          </div>
+          <span class="whx_badge">自动记录</span>
+        </div>
+
+        <div class="whx_table-wrap">
+          <table class="whx_table">
+            <thead>
+              <tr>
+                <th>操作</th>
+                <th>事件触发顺序（本页实测）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>单击</th><td contenteditable="true" data-op="tap">—</td></tr>
+              <tr><th>向上拖动</th><td contenteditable="true" data-op="up">—</td></tr>
+              <tr><th>向左快速滑</th><td contenteditable="true" data-op="left">—</td></tr>
+              <tr><th>双指触摸</th><td contenteditable="true" data-op="pinch">—</td></tr>
+              <tr><th>长按后抬起</th><td contenteditable="true" data-op="hold">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="whx_note">
+          判定规则：位移 &lt; 12px 且用时 &lt; 600ms 记为单击；位移 ≥ 12px 按主方向分类（向左位移大且速度 ≥ 0.6px/ms 记为快速左滑）；按住 ≥ 600ms 记为长按；最多同时 2 根手指记为双指。向下 / 向右拖动只更新摘要，不写入表格。
+        </p>
+      </section>
+
+      <!-- 轨迹草图 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>加分项 · 轨迹草图</h3>
+            <p>日志坐标自动连线：绿色起点、红色终点</p>
+          </div>
+          <button class="whx_btn whx_btn--small" id="whxClearTrace" type="button">清空轨迹</button>
+        </div>
+        <canvas class="whx_trace" id="whxTrace" width="720" height="340"></canvas>
+        <p class="whx_note">
+          每来一次 <code>touchmove</code> 记一个点，按顺序连线；虚线框表示探针区的实际范围。点越密说明移动越慢、采样越充分，点很稀通常是快速滑动或浏览器合并了事件。
+        </p>
+      </section>
+
+      <!-- 验收答案 -->
+      <section class="whx_answers">
+        <h3>验收三问 · 参考答案</h3>
+
+        <article class="whx_answer">
+          <span class="whx_answer-no">01</span>
+          <h4>一次拖动里 touchmove 大约触发多少次？和距离有什么关系？</h4>
+          <p>没有固定次数。浏览器按屏幕刷新节奏采样手指位置（通常 60Hz，约每 16.7ms 一次），所以 1 秒的慢拖大约 30～60 次；一次 200px 的快滑常常只有 10～20 次。次数与“移动距离 × 持续时间”正相关：距离越长、拖得越慢，move 越多；距离短、速度快，move 就少。不同机型和浏览器还会合并事件，所以每次数字都不同。</p>
+        </article>
+
+        <article class="whx_answer">
+          <span class="whx_answer-no">02</span>
+          <h4>click 出现在 touchend 之前还是之后？</h4>
+          <p>之后。完整顺序是：<code>touchstart</code> → <code>touchmove</code> × N → <code>touchend</code> → <code>click</code>（部分浏览器中间还会补发 mouseover / mousedown / mouseup）。日志里 click 的时间戳总比 touchend 晚几毫秒到 300ms。</p>
+          <p>注意：手指移动超过系统点击容差，或在 touch 事件里调用了 <code>preventDefault()</code>，click 可能根本不补发。</p>
+        </article>
+
+        <article class="whx_answer">
+          <span class="whx_answer-no">03</span>
+          <h4>如果把 touchend 换成 touchcancel，会发生什么？</h4>
+          <p><code>touchend</code> 只在正常抬手时触发；<code>touchcancel</code> 只在被系统打断时触发（来电、通知横幅、手势返回、浏览器接管滚动）。把 touchend 换成 touchcancel 后：正常抬手收不到结束事件，距离、方向、长按计时都停不下来，状态会卡死；只有被打断时才执行一次收尾，反而正常操作全部失效。</p>
+          <p>正确做法：同时监听 <code>touchend</code> 和 <code>touchcancel</code>，让它们调用同一个收尾函数。</p>
+        </article>
+      </section>
+    </section>
+
+    <!-- ================= 任务二 ================= -->
+    <section class="whx_task" id="whxTask2">
+      <div class="whx_task-head">
+        <div class="whx_task-meta">
+          <span class="whx_star">任务二</span>
+          <span class="whx_dim">维度：手势识别 · DOM 操作</span>
+          <span class="whx_done">已完成</span>
+        </div>
+        <h2>手势卡片：左右滑动切换内容</h2>
+      </div>
+
+      <div class="whx_reqs">
+        <div class="whx_req whx_req--task">
+          <span class="whx_chip">任务</span>
+          <p>做一张“中华美食卡片”，包含 4 道菜。左右滑动时切换到上一道 / 下一道，滑到第一张再往前滑要有提示；卡片切换带 0.3s 过渡动画。</p>
+        </div>
+        <div class="whx_req whx_req--check">
+          <span class="whx_chip">验收</span>
+          <p>① 短距离误触不会切换（阈值生效）；② 快速连续滑动不会跳两张；③ 手机上拖动时页面不会跟着上下滚动。</p>
+        </div>
+      </div>
+
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>中华美食卡片</h3>
+            <p>左滑下一道 · 右滑上一道 · 阈值 40px</p>
+          </div>
+          <div class="whx_gesture-arrows">
+            <button class="whx_btn whx_btn--small" id="whxPrev" type="button">上一道</button>
+            <button class="whx_btn whx_btn--small" id="whxNext" type="button">下一道</button>
+          </div>
+        </div>
+
+        <div class="whx_swipe" id="whxSwipe">
+          <div class="whx_track" id="whxTrack">
+            <article class="whx_slide whx_slide--1">
+              <span class="whx_slide-no">01 / 04</span>
+              <span class="whx_slide-word">麻</span>
+              <div class="whx_slide-body">
+                <span class="whx_slide-tag">川菜 · 麻辣</span>
+                <h4>麻婆豆腐</h4>
+                <p>麻辣鲜香，豆腐嫩滑，一勺红油拌饭，是川菜馆里最稳的下饭担当。</p>
+              </div>
+            </article>
+
+            <article class="whx_slide whx_slide--2">
+              <span class="whx_slide-no">02 / 04</span>
+              <span class="whx_slide-word">鱼</span>
+              <div class="whx_slide-body">
+                <span class="whx_slide-tag">浙菜 · 酸甜</span>
+                <h4>西湖醋鱼</h4>
+                <p>酸甜微咸，鱼肉细嫩，浇上琥珀色的糖醋汁，是杭帮菜的经典代表。</p>
+              </div>
+            </article>
+
+            <article class="whx_slide whx_slide--3">
+              <span class="whx_slide-no">03 / 04</span>
+              <span class="whx_slide-word">锅</span>
+              <div class="whx_slide-body">
+                <span class="whx_slide-tag">川渝 · 红油</span>
+                <h4>重庆火锅</h4>
+                <p>红油翻滚，毛肚七上八下，一桌人围着热气腾腾，烟火气直接拉满。</p>
+              </div>
+            </article>
+
+            <article class="whx_slide whx_slide--4">
+              <span class="whx_slide-no">04 / 04</span>
+              <span class="whx_slide-word">肉</span>
+              <div class="whx_slide-body">
+                <span class="whx_slide-tag">浙菜 · 慢炖</span>
+                <h4>东坡肉</h4>
+                <p>慢火细炖，肥而不腻，酱色红亮，酥香入口即化，配米饭最合适。</p>
+              </div>
+            </article>
+          </div>
+          <div class="whx_toast" id="whxToast">已经是第一张</div>
+        </div>
+
+        <div class="whx_swipe-bar">
+          <span class="whx_page" id="whxPage">第 1/4 张</span>
+          <div class="whx_dots" id="whxDots">
+            <i class="is-on"></i><i></i><i></i><i></i>
+          </div>
+        </div>
+
+        <p class="whx_note">
+          实现要点：用 <code>touchstart / touchend</code> 配合 <code>changedTouches[0]</code> 计算横向位移，40px 阈值过滤误触；切换后 300ms 内忽略下一次滑动，快速连滑不会跳两张；容器使用 <code>touch-action: pan-y</code>，只接管横向手势，纵向仍可正常滚动页面；切换动画 0.3s，边界时回弹并提示“已经是第一张 / 最后一张”。
+        </p>
+      </section>
+    </section>
+
+    <!-- ================= 任务三 ================= -->
+    <section class="whx_task" id="whxTask3">
+      <div class="whx_task-head">
+        <div class="whx_task-meta">
+          <span class="whx_star">任务三</span>
+          <span class="whx_dim">维度：多指手势 · 变换 · 状态管理</span>
+          <span class="whx_done">已完成</span>
+        </div>
+        <h2>图片查看器：双指缩放 + 双击放大 + 拖动</h2>
+      </div>
+
+      <div class="whx_reqs">
+        <div class="whx_req whx_req--task">
+          <span class="whx_chip">任务</span>
+          <p>做一个可交互的图片查看器：双指缩放（1x～4x）、双击在 1x / 2x 之间切换、放大后可单指拖动查看细节，缩回 1x 自动居中。</p>
+        </div>
+        <div class="whx_req whx_req--check">
+          <span class="whx_chip">验收</span>
+          <p>① 缩放以两指中心为基准，图片不会“跳走”；② 缩放到边界有阻尼或限制；③ 1x 时不能拖出边界；④ 旋转屏幕后不丢失状态。</p>
+        </div>
+        <div class="whx_req whx_req--bonus">
+          <span class="whx_chip">加分</span>
+          <p>缩放比例指示器（左上角实时显示 1.00×～4.00×），已实现；双指旋转留作后续扩展。</p>
+        </div>
+      </div>
+
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>图片查看器</h3>
+            <p>双指 1×–4× · 双击 1×/2× · 放大后单指拖动</p>
+          </div>
+          <div class="whx_zoom-actions">
+            <button class="whx_btn whx_btn--small" type="button" data-zoom="1">1×</button>
+            <button class="whx_btn whx_btn--small" type="button" data-zoom="2">2×</button>
+            <button class="whx_btn whx_btn--small" type="button" data-zoom="4">4×</button>
+          </div>
+        </div>
+
+        <div class="whx_zoom" id="whxZoom">
+          <img class="whx_zoom-img" id="whxZoomImg" src="swiper-imgs/fast_1.jpg" alt="中国天眼 FAST 射电望远镜全景">
+          <span class="whx_zoom-badge" id="whxZoomBadge">1.00×</span>
+          <span class="whx_zoom-hint" id="whxZoomHint">双击放大 · 双指缩放请用手机打开</span>
+        </div>
+
+        <div class="whx_zoom-bar">
+          <span class="whx_zoom-note">缩放范围 1×–4×；1× 时禁止拖动，缩回 1× 自动居中；旋转屏幕保留缩放与位置状态。</span>
+        </div>
+        <p class="whx_note">
+          交互说明：双指按下后以两指中点为锚缩放；单指仅在放大后拖动，位移被限制在图片边界内；双击在 1× 与 2× 之间切换，过渡 0.25s。桌面预览可用右上角 1× / 2× / 4× 按钮。
+        </p>
+      </section>
+
+      <!-- 手机测试视频位 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>手机实测录屏</h3>
+            <p>视频位已预留：放手机操作视频到这里</p>
+          </div>
+          <span class="whx_badge">视频位</span>
+        </div>
+
+        <div class="whx_video-slot" id="whxVideoSlot">
+          <!-- 永久插入方式：把录屏命名为 mobile-zoom.mp4 放在本文件同目录，
+               给下面的 video 加上 src="mobile-zoom.mp4" 并删除 hidden 即可 -->
+          <video class="whx_video" id="whxZoomVideo" controls playsinline preload="metadata" hidden></video>
+
+          <div class="whx_video-empty" id="whxVideoEmpty">
+            <span class="whx_video-play"></span>
+            <p>把手机录屏命名为 <code>mobile-zoom.mp4</code> 放在本页面同目录，并把下方视频的 <code>src</code> 指过去；也可以先选择本地视频临时预览（不会上传）。</p>
+            <label class="whx_btn whx_btn--small" for="whxVideoFile">选择本地视频</label>
+            <input class="whx_video-input" id="whxVideoFile" type="file" accept="video/*">
+          </div>
+        </div>
+
+        <p class="whx_note">建议录制内容：双指从 1× 放大到 4×、双击在 1×/2× 之间切换、放大后单指拖动到边界、缩回 1× 自动居中。</p>
+      </section>
+
+      <!-- 答辩要点 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>答辩要点 · 为什么缩放不“跳”</h3>
+            <p>核心：以两指中点为锚，而不是以图片左上角为锚</p>
+          </div>
+        </div>
+        <ol class="whx_steps">
+          <li>两指按下时记录初始间距与初始缩放比例，并算出中点在图片坐标系中的位置：<code>anchor = (mid - translate) / scale</code>。</li>
+          <li>每次 <code>touchmove</code> 用新间距算出新比例，再反推位移：<code>translate = mid - anchor × newScale</code>。</li>
+          <li>这样中点下方的同一块图像始终留在中点，视觉上像手指“捏住”了图片，所以缩放不会跳。</li>
+          <li>比例限制在 1–4 倍；位移始终夹紧在图片边界内；1× 时位移强制归零；旋转屏幕只重新夹紧、不重置比例，因此状态不丢。</li>
+        </ol>
+      </section>
+    </section>
+
+    <!-- ================= 任务四 ================= -->
+    <section class="whx_task" id="whxTask4">
+      <div class="whx_task-head">
+        <div class="whx_task-meta">
+          <span class="whx_star">任务四</span>
+          <span class="whx_dim">维度：设备传感器 · 权限 · 降级</span>
+          <span class="whx_done">已完成</span>
+        </div>
+        <h2>摇一摇彩蛋：抽出今日菜谱</h2>
+      </div>
+
+      <div class="whx_reqs">
+        <div class="whx_req whx_req--task">
+          <span class="whx_chip">任务</span>
+          <p>二选一，本页实现方案 A：连续摇动手机触发“摇出今日菜谱”。页面提示“摇一摇手机，抽今日菜谱”，下方显示随机抽到的菜。</p>
+        </div>
+        <div class="whx_req whx_req--check">
+          <span class="whx_chip">验收</span>
+          <p>① 一次摇动只触发一次（有冷却）；② 在没有加速度传感器的设备上显示“当前设备不支持”，不报错不白屏；③ iOS 上通过按钮触发权限申请；④ 能讲清 <code>accelerationIncludingGravity</code> 与 <code>acceleration</code> 的区别。</p>
+        </div>
+      </div>
+
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>摇一摇 · 今日菜谱</h3>
+            <p>devicemotion · 阈值 18 · 冷却 1.5s</p>
+          </div>
+          <span class="whx_state" id="whxSensorState">检测传感器…</span>
+        </div>
+
+        <div class="whx_sensor">
+          <p class="whx_sensor-kicker">SHAKE · DEVICE MOTION</p>
+          <p class="whx_sensor-title">摇一摇手机，抽今日菜谱</p>
+
+          <div class="whx_sensor-result" id="whxSensorResult">
+            <span class="whx_sensor-dish" id="whxSensorDish">今天吃什么？</span>
+            <span class="whx_sensor-desc" id="whxSensorDesc">摇一摇手机，让手机替你做决定。</span>
+          </div>
+
+          <div class="whx_sensor-actions">
+            <button class="whx_btn" id="whxSensorPick" type="button">点我抽一次</button>
+            <button class="whx_btn" id="whxSensorPerm" type="button" hidden>开启传感器权限</button>
+          </div>
+
+          <div class="whx_sensor-live" id="whxSensorLive">合成加速度 — · 阈值 18 · 冷却 1.5s</div>
+        </div>
+
+        <p class="whx_sensor-tip" id="whxSensorTip">桌面浏览器没有加速度传感器时，会自动退化为“点我抽一次”，不会报错或白屏。</p>
+        <p class="whx_note">实现要点：监听 <code>devicemotion</code>，用 <code>accelerationIncludingGravity</code> 的三轴分量计算合成加速度；超过 18 触发抽菜谱，随后忽略 1.5s 内的重复触发；1.8s 内收不到有效数据就切换为“设备不支持”提示，并保留下方降级按钮。</p>
+      </section>
+
+      <!-- 手机测试视频位 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>手机实测录屏</h3>
+            <p>视频位已预留：放摇一摇测试视频到这里</p>
+          </div>
+          <span class="whx_badge">视频位</span>
+        </div>
+
+        <div class="whx_video-slot">
+          <!-- 永久插入方式：把录屏命名为 mobile-sensor.mp4 放在本文件同目录，
+               给下面的 video 加上 src="mobile-sensor.mp4" 并删除 hidden 即可 -->
+          <video class="whx_video" id="whxSensorVideo" controls playsinline preload="metadata" hidden></video>
+
+          <div class="whx_video-empty" id="whxSensorVideoEmpty">
+            <span class="whx_video-play"></span>
+            <p>把手机录屏命名为 <code>mobile-sensor.mp4</code> 放在本页面同目录，并把下方视频的 <code>src</code> 指过去；也可以先选择本地视频临时预览（不会上传）。</p>
+            <label class="whx_btn whx_btn--small" for="whxSensorVideoFile">选择本地视频</label>
+            <input class="whx_video-input" id="whxSensorVideoFile" type="file" accept="video/*">
+          </div>
+        </div>
+
+        <p class="whx_note">建议录制内容：摇动手机触发抽菜谱、1.5s 内连续摇动不重复触发、iOS 上点“开启传感器权限”后再次摇动，以及桌面端“点我抽一次”的降级效果。</p>
+      </section>
+
+      <!-- 答辩要点 -->
+      <section class="whx_card">
+        <div class="whx_card-head">
+          <div>
+            <h3>答辩要点 · 两个加速度与降级</h3>
+            <p>为什么用 accelerationIncludingGravity 判断摇动</p>
+          </div>
+        </div>
+        <ol class="whx_steps">
+          <li><code>accelerationIncludingGravity</code>：包含重力。手机静止放平时合成值约为 9.8，摇动时会明显冲高，所以用它判断“摇一摇”最稳定。</li>
+          <li><code>acceleration</code>：已经去掉重力，静止时接近 0，只反映手部施加的加速度；部分设备或浏览器不提供该字段，取到的是 <code>null</code>。</li>
+          <li>为什么必须做降级：桌面浏览器没有加速度传感器、iOS 需要用户手势授权、非 HTTPS 环境也可能拿不到数据。如果只依赖 <code>devicemotion</code>，页面会一直无反应，看起来就像坏了。</li>
+          <li>因此保留“点我抽一次”按钮，并在 1.8s 内收不到有效数据时明确提示“当前设备不支持，请用手机打开”，保证核心功能始终可用。</li>
+        </ol>
+      </section>
+    </section>
+
+  </main>
+
+  <footer class="whx_footer">
+    <p>吴慧贤（24002120213） · 高级网页设计 · 移动端事件课堂实践 · 2026-11-18</p>
+    <p><a href="index.html">返回课程目录</a></p>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== DOM 引用 ===== */
+      var whx_pad = document.getElementById('whxPad');
+      var whx_logBox = document.getElementById('whxLog');
+      var whx_state = document.getElementById('whxState');
+      var whx_live = document.getElementById('whxLive');
+      var whx_dot = document.getElementById('whxDot');
+      var whx_tip = document.getElementById('whxTip');
+      var whx_trace = document.getElementById('whxTrace');
+      var whx_ctx = whx_trace.getContext('2d');
+      var whx_lastType = document.getElementById('whxLastType');
+      var whx_lastMoves = document.getElementById('whxLastMoves');
+      var whx_lastDist = document.getElementById('whxLastDist');
+      var whx_lastTime = document.getElementById('whxLastTime');
+      var whx_lastSpeed = document.getElementById('whxLastSpeed');
+
+      /* ===== 任务二 DOM 引用 ===== */
+      var whx_swipeEl = document.getElementById('whxSwipe');
+      var whx_trackEl = document.getElementById('whxTrack');
+      var whx_toastEl = document.getElementById('whxToast');
+      var whx_pageEl = document.getElementById('whxPage');
+      var whx_dotsEl = document.getElementById('whxDots');
+
+      /* ===== 任务二手势卡片状态 ===== */
+      var whx_index = 0;
+      var whx_total = 4;
+      var whx_lastSwitchAt = 0;
+      var whx_swipeStartX = 0;
+      var whx_swipeStartY = 0;
+      var whx_dragging = false;
+      var whx_ignoreSwipe = false;
+      var whx_toastTimer = null;
+
+      /* ===== 任务三 DOM 引用 ===== */
+      var whx_zoomEl = document.getElementById('whxZoom');
+      var whx_zoomImg = document.getElementById('whxZoomImg');
+      var whx_zoomBadge = document.getElementById('whxZoomBadge');
+      var whx_zoomHint = document.getElementById('whxZoomHint');
+
+      /* ===== 任务三图片查看器状态 ===== */
+      var whx_scale = 1;
+      var whx_tx = 0;
+      var whx_ty = 0;
+      var whx_zoomMode = 'none';
+      var whx_panStartX = 0;
+      var whx_panStartY = 0;
+      var whx_panStartTx = 0;
+      var whx_panStartTy = 0;
+      var whx_pinchStartDist = 1;
+      var whx_pinchStartScale = 1;
+      var whx_pinchAnchorX = 0;
+      var whx_pinchAnchorY = 0;
+      var whx_tapStart = null;
+      var whx_lastTapAt = 0;
+
+      /* ===== 任务四 DOM 引用 ===== */
+      var whx_sensorState = document.getElementById('whxSensorState');
+      var whx_sensorResult = document.getElementById('whxSensorResult');
+      var whx_sensorDish = document.getElementById('whxSensorDish');
+      var whx_sensorDesc = document.getElementById('whxSensorDesc');
+      var whx_sensorLive = document.getElementById('whxSensorLive');
+      var whx_sensorTip = document.getElementById('whxSensorTip');
+      var whx_sensorPerm = document.getElementById('whxSensorPerm');
+
+      /* ===== 任务四摇一摇状态 ===== */
+      var whx_dishes = [
+        { name: '番茄炒蛋', desc: '酸甜下饭，十分钟搞定的家常首选。' },
+        { name: '麻辣香锅', desc: '想吃什么加什么，一锅端上桌。' },
+        { name: '清蒸鲈鱼', desc: '清淡鲜嫩，水开后蒸八分钟就好。' },
+        { name: '红烧牛肉面', desc: '一碗热汤面，牛肉给得足足的。' },
+        { name: '蛋炒饭', desc: '隔夜饭的最佳归宿，粒粒分明。' },
+        { name: '酸辣土豆丝', desc: '脆爽开胃，配米饭刚刚好。' }
+      ];
+      var whx_lastDish = -1;
+      var whx_cooldownUntil = 0;
+      var whx_cooldownTimer = null;
+      var whx_motionTimer = null;
+      var whx_motionBound = false;
+      var whx_motionSeen = false;
+
+      /* ===== 手势状态 ===== */
+      var whx_active = false;
+      var whx_startTime = 0;
+      var whx_startX = 0;
+      var whx_startY = 0;
+      var whx_maxFingers = 1;
+      var whx_moveCount = 0;
+      var whx_seq = [];
+      var whx_points = [];
+      var whx_gestureStartAt = 0;
+      var whx_logSeq = 0;
+      var whx_lastGesture = null;
+      var whx_counts = { start: 0, move: 0, end: 0, cancel: 0, click: 0 };
+
+      /* 手势类型 → 记录表行 */
+      var whx_rowMap = {
+        '单击': 'tap',
+        '向上拖动': 'up',
+        '向左快速滑': 'left',
+        '向左拖动': 'left',
+        '双指触摸': 'pinch',
+        '长按后抬起': 'hold'
+      };
+
+      /* 取手指相对探针区左上角的坐标 */
+      function whx_localPoint(touch) {
+        var rect = whx_pad.getBoundingClientRect();
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      }
+
+      /* 更新顶部状态文字 */
+      function whx_setState(text, active) {
+        whx_state.textContent = text;
+        if (active) {
+          whx_state.classList.add('is-active');
+        } else {
+          whx_state.classList.remove('is-active');
+        }
+      }
+
+      /* 更新各类事件的计数显示 */
+      function whx_updateCounters() {
+        var keys = ['start', 'move', 'end', 'cancel', 'click'];
+        for (var i = 0; i < keys.length; i++) {
+          var box = document.querySelector('.whx_counter[data-key="' + keys[i] + '"] b');
+          if (box) {
+            box.textContent = whx_counts[keys[i]];
+          }
+        }
+      }
+
+      /* 某一类事件计数加一并刷新显示 */
+      function whx_bump(key) {
+        whx_counts[key]++;
+        whx_updateCounters();
+      }
+
+      /* 向日志面板追加一行，保留最近 200 条并自动滚到底部 */
+      function whx_addLog(name, x, y, fingers, note) {
+        if (whx_logBox.querySelector('.whx_log-empty')) {
+          whx_logBox.innerHTML = '';
+        }
+
+        whx_logSeq++;
+        var elapsed = whx_gestureStartAt ? Math.round(performance.now() - whx_gestureStartAt) : 0;
+
+        var line = document.createElement('div');
+        line.className = 'whx_log-line';
+
+        var idx = document.createElement('span');
+        idx.className = 'whx_log-idx';
+        idx.textContent = '#' + String(whx_logSeq).padStart(3, '0');
+
+        var time = document.createElement('span');
+        time.className = 'whx_log-time';
+        time.textContent = '+' + elapsed + 'ms';
+
+        var ev = document.createElement('span');
+        ev.className = 'whx_log-ev whx_ev-' + name;
+        ev.textContent = name;
+
+        line.appendChild(idx);
+        line.appendChild(time);
+        line.appendChild(ev);
+
+        if (typeof x === 'number' && typeof y === 'number') {
+          var xy = document.createElement('span');
+          xy.className = 'whx_log-meta';
+          xy.textContent = 'x ' + Math.round(x) + ' · y ' + Math.round(y);
+          line.appendChild(xy);
+        }
+
+        if (typeof fingers === 'number') {
+          var count = document.createElement('span');
+          count.className = 'whx_log-meta';
+          count.textContent = (note || 'touches') + ' ' + fingers;
+          line.appendChild(count);
+        } else if (note) {
+          var tip = document.createElement('span');
+          tip.className = 'whx_log-meta';
+          tip.textContent = note;
+          line.appendChild(tip);
+        }
+
+        whx_logBox.appendChild(line);
+        while (whx_logBox.children.length > 200) {
+          whx_logBox.removeChild(whx_logBox.firstChild);
+        }
+        whx_logBox.scrollTop = whx_logBox.scrollHeight;
+      }
+
+      /* 把手指位置同步到探针区里的发光点 */
+      function whx_moveDot(point) {
+        whx_dot.style.opacity = '1';
+        whx_dot.style.transform = 'translate(' + point.x + 'px,' + point.y + 'px)';
+      }
+
+      /* 更新探针区底部的实时读数 */
+      function whx_updateLive(e, point) {
+        var dx = point.x - whx_startX;
+        var dy = point.y - whx_startY;
+        var dist = Math.hypot(dx, dy);
+        whx_live.textContent = '手指 ' + e.touches.length
+          + ' · x ' + Math.round(point.x)
+          + ' · y ' + Math.round(point.y)
+          + ' · 位移 ' + Math.round(dist) + 'px';
+      }
+
+      /* 一次新的触摸按下：初始化手势；第二根手指按下时只更新手指数 */
+      function whx_handleStart(e) {
+        var point = whx_localPoint(e.touches[0]);
+
+        if (!whx_active) {
+          whx_active = true;
+          whx_startTime = performance.now();
+          whx_gestureStartAt = whx_startTime;
+          whx_startX = point.x;
+          whx_startY = point.y;
+          whx_moveCount = 0;
+          whx_maxFingers = e.touches.length;
+          whx_seq = ['touchstart'];
+          whx_points = [{ x: point.x, y: point.y }];
+          whx_pad.classList.add('is-active');
+          whx_setState('记录中', true);
+        } else {
+          whx_maxFingers = Math.max(whx_maxFingers, e.touches.length);
+          whx_seq.push('touchstart');
+        }
+
+        whx_bump('start');
+        whx_addLog('touchstart', point.x, point.y, e.touches.length);
+        whx_moveDot(point);
+        whx_updateLive(e, point);
+        whx_tip.textContent = '记录中……抬起手指后会自动填入记录表。';
+      }
+
+      /* 手指移动：记录每一次 touchmove，并实时画出轨迹 */
+      function whx_handleMove(e) {
+        if (!whx_active) {
+          return;
+        }
+
+        var point = whx_localPoint(e.touches[0]);
+        whx_maxFingers = Math.max(whx_maxFingers, e.touches.length);
+        whx_moveCount++;
+        whx_seq.push('touchmove');
+
+        if (e.touches.length === 1 && whx_points.length < 500) {
+          whx_points.push({ x: point.x, y: point.y });
+        }
+
+        whx_bump('move');
+        whx_addLog('touchmove', point.x, point.y, e.touches.length);
+        whx_moveDot(point);
+        whx_updateLive(e, point);
+        whx_drawTrace();
+      }
+
+      /* 手指抬起：记录 touchend；最后一根手指离开时结束本次手势 */
+      function whx_handleEnd(e) {
+        if (!whx_active) {
+          return;
+        }
+
+        var touch = e.changedTouches[0];
+        var point = whx_localPoint(touch);
+        whx_bump('end');
+        whx_addLog('touchend', point.x, point.y, e.changedTouches.length, 'changed');
+        whx_seq.push('touchend');
+
+        if (e.touches.length > 0) {
+          whx_maxFingers = Math.max(whx_maxFingers, e.touches.length);
+          whx_moveDot(whx_localPoint(e.touches[0]));
+          return;
+        }
+
+        whx_finishGesture(point.x, point.y, false);
+      }
+
+      /* 触摸被系统打断：记录 touchcancel 并以“打断”状态结束手势 */
+      function whx_handleCancel(e) {
+        if (!whx_active) {
+          return;
+        }
+
+        var touch = e.changedTouches && e.changedTouches[0];
+        var point = touch ? whx_localPoint(touch) : { x: whx_startX, y: whx_startY };
+        whx_bump('cancel');
+        whx_addLog('touchcancel', point.x, point.y, e.changedTouches ? e.changedTouches.length : 0, '被系统打断');
+        whx_seq.push('touchcancel');
+        whx_finishGesture(point.x, point.y, true);
+        whx_tip.textContent = 'touchcancel：手势被系统打断，本次不计入记录表。';
+      }
+
+      /* 补发的 click：记录并追加到上一次手势的顺序里 */
+      function whx_handleClick(e) {
+        var point = whx_localPoint(e);
+        whx_bump('click');
+        whx_addLog('click', point.x, point.y, null, '系统补发');
+
+        if (whx_lastGesture && !whx_active && performance.now() - whx_lastGesture.endAt < 800) {
+          var last = whx_lastGesture.seq[whx_lastGesture.seq.length - 1];
+          if (last !== 'click') {
+            whx_lastGesture.seq.push('click');
+          }
+          whx_fillTable(whx_lastGesture);
+          whx_tip.textContent = '已记录 click：touch 之后系统又补发了一次。';
+        }
+      }
+
+      /* 统一收尾：计算距离、速度，判定手势类型并写入表格 */
+      function whx_finishGesture(endX, endY, canceled) {
+        whx_active = false;
+        whx_pad.classList.remove('is-active');
+        whx_dot.style.opacity = '0';
+
+        if (!canceled) {
+          whx_points.push({ x: endX, y: endY });
+        }
+
+        var endTime = performance.now();
+        var dx = endX - whx_startX;
+        var dy = endY - whx_startY;
+        var dist = Math.hypot(dx, dy);
+        var duration = Math.max(1, endTime - whx_startTime);
+
+        var gesture = {
+          startX: whx_startX,
+          startY: whx_startY,
+          endX: endX,
+          endY: endY,
+          dx: dx,
+          dy: dy,
+          dist: dist,
+          duration: duration,
+          moves: whx_moveCount,
+          fingers: whx_maxFingers,
+          seq: whx_seq.slice(),
+          points: whx_points.slice(),
+          canceled: canceled,
+          endAt: endTime,
+          type: ''
+        };
+
+        gesture.type = whx_classify(gesture);
+        whx_lastGesture = gesture;
+
+        whx_fillTable(gesture);
+        whx_updateSummary(gesture);
+        whx_drawTrace();
+        whx_setState('已结束', false);
+        whx_tip.textContent = '最近一次：' + gesture.type + '，' + whx_seqText(gesture);
+      }
+
+      /* 根据位移、时长与手指数判定手势类型 */
+      function whx_classify(gesture) {
+        if (gesture.canceled) {
+          return 'touchcancel 打断';
+        }
+        if (gesture.fingers >= 2) {
+          return '双指触摸';
+        }
+        if (gesture.dist < 12) {
+          return gesture.duration >= 600 ? '长按后抬起' : '单击';
+        }
+
+        var horizontal = Math.abs(gesture.dx) > Math.abs(gesture.dy);
+        if (horizontal) {
+          var speed = gesture.dist / gesture.duration;
+          if (gesture.dx < 0) {
+            return speed >= 0.6 ? '向左快速滑' : '向左拖动';
+          }
+          return '向右拖动';
+        }
+        return gesture.dy < 0 ? '向上拖动' : '向下拖动';
+      }
+
+      /* 把 touchmove 合并成“touchmove×N”的可读顺序文本 */
+      function whx_seqText(gesture) {
+        var out = [];
+        var moves = 0;
+        for (var i = 0; i < gesture.seq.length; i++) {
+          var name = gesture.seq[i];
+          if (name === 'touchmove') {
+            moves++;
+            continue;
+          }
+          if (moves) {
+            out.push('touchmove×' + moves);
+            moves = 0;
+          }
+          out.push(name);
+        }
+        if (moves) {
+          out.push('touchmove×' + moves);
+        }
+        return out.join(' → ');
+      }
+
+      /* 将本次手势顺序与位移数据写入记录表对应行 */
+      function whx_fillTable(gesture) {
+        var key = whx_rowMap[gesture.type];
+        if (!key) {
+          return;
+        }
+
+        var cell = document.querySelector('.whx_table td[data-op="' + key + '"]');
+        if (!cell) {
+          return;
+        }
+
+        var meta = '位移 ' + Math.round(gesture.dist) + 'px'
+          + ' · 用时 ' + (gesture.duration / 1000).toFixed(2) + 's'
+          + ' · move ' + gesture.moves + ' 次';
+
+        cell.innerHTML = '<div class="whx_cell-seq">' + whx_seqText(gesture) + '</div>'
+          + '<div class="whx_cell-meta">' + meta + '</div>';
+      }
+
+      /* 刷新“最近一次手势”的五个统计值 */
+      function whx_updateSummary(gesture) {
+        whx_lastType.textContent = gesture.type;
+        whx_lastMoves.textContent = gesture.moves + ' 次';
+        whx_lastDist.textContent = Math.round(gesture.dist) + ' px';
+        whx_lastTime.textContent = (gesture.duration / 1000).toFixed(2) + ' s';
+        whx_lastSpeed.textContent = (gesture.dist / gesture.duration).toFixed(2) + ' px/ms';
+      }
+
+      /* 清空“最近一次手势”的统计值 */
+      function whx_resetSummary() {
+        whx_lastType.textContent = '—';
+        whx_lastMoves.textContent = '—';
+        whx_lastDist.textContent = '—';
+        whx_lastTime.textContent = '—';
+        whx_lastSpeed.textContent = '—';
+      }
+
+      /* 在 canvas 上绘制坐标轴、探针区边框与手指轨迹 */
+      function whx_drawTrace() {
+        var W = whx_trace.width;
+        var H = whx_trace.height;
+        var ctx = whx_ctx;
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#121020';
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        for (var gx = 0; gx <= W; gx += 36) {
+          ctx.beginPath();
+          ctx.moveTo(gx + 0.5, 0);
+          ctx.lineTo(gx + 0.5, H);
+          ctx.stroke();
+        }
+        for (var gy = 0; gy <= H; gy += 36) {
+          ctx.beginPath();
+          ctx.moveTo(0, gy + 0.5);
+          ctx.lineTo(W, gy + 0.5);
+          ctx.stroke();
+        }
+
+        var padRect = whx_pad.getBoundingClientRect();
+        if (!whx_points.length || padRect.width === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.font = '14px "Microsoft YaHei", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('拖动一次，这里会画出你的手指轨迹', W / 2, H / 2);
+          return;
+        }
+
+        var padW = Math.max(1, padRect.width);
+        var padH = Math.max(1, padRect.height);
+        var scale = Math.min((W - 56) / padW, (H - 56) / padH);
+        var ox = (W - padW * scale) / 2;
+        var oy = (H - padH * scale) / 2;
+
+        ctx.strokeStyle = 'rgba(139,127,240,0.4)';
+        ctx.setLineDash([6, 6]);
+        ctx.strokeRect(ox, oy, padW * scale, padH * scale);
+        ctx.setLineDash([]);
+
+        var grad = ctx.createLinearGradient(ox, oy, ox + padW * scale, oy + padH * scale);
+        grad.addColorStop(0, '#5ee3b0');
+        grad.addColorStop(1, '#a99bff');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+
+        for (var i = 0; i < whx_points.length; i++) {
+          var px = ox + whx_points[i].x * scale;
+          var py = oy + whx_points[i].y * scale;
+          if (i === 0) {
+            ctx.moveTo(px, py);
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+        ctx.stroke();
+
+        var first = whx_points[0];
+        var last = whx_points[whx_points.length - 1];
+
+        ctx.fillStyle = '#5ee3b0';
+        ctx.beginPath();
+        ctx.arc(ox + first.x * scale, oy + first.y * scale, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ff6b78';
+        ctx.beginPath();
+        ctx.arc(ox + last.x * scale, oy + last.y * scale, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = '11px "Microsoft YaHei", sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.62)';
+        ctx.textAlign = 'left';
+        ctx.fillText('起点', ox + first.x * scale + 8, oy + first.y * scale - 8);
+        ctx.textAlign = 'right';
+        ctx.fillText('终点', ox + last.x * scale - 8, oy + last.y * scale - 8);
+      }
+
+      /* 清空日志、计数和最近一次手势摘要 */
+      function whx_clearLog() {
+        whx_logBox.innerHTML = '<div class="whx_log-empty">等待你的第一次触摸……</div>';
+        whx_logSeq = 0;
+        whx_counts = { start: 0, move: 0, end: 0, cancel: 0, click: 0 };
+        whx_updateCounters();
+        whx_resetSummary();
+        whx_lastGesture = null;
+        whx_gestureStartAt = 0;
+        whx_active = false;
+        whx_pad.classList.remove('is-active');
+        whx_dot.style.opacity = '0';
+        whx_live.textContent = '手指 0 · x — · y — · 位移 0px';
+        whx_setState('等待触摸', false);
+        whx_tip.textContent = '日志与计数已清空，记录表内容保留。';
+      }
+
+      /* 给探针区绑定 touch 五件套与长按时阻止系统菜单 */
+      function whx_bindEvents() {
+        whx_pad.addEventListener('touchstart', whx_handleStart, { passive: true });
+        whx_pad.addEventListener('touchmove', whx_handleMove, { passive: true });
+        whx_pad.addEventListener('touchend', whx_handleEnd, { passive: true });
+        whx_pad.addEventListener('touchcancel', whx_handleCancel, { passive: true });
+        whx_pad.addEventListener('click', whx_handleClick);
+        whx_pad.addEventListener('contextmenu', function (e) {
+          e.preventDefault();
+        });
+      }
+
+      /* 渲染卡片轨道位置，并同步页码与圆点 */
+      function whx_renderSwipe(animate, offset) {
+        var width = whx_swipeEl.clientWidth || 1;
+        var x = -whx_index * width + (offset || 0);
+        whx_trackEl.style.transition = animate
+          ? 'transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1)'
+          : 'none';
+        whx_trackEl.style.transform = 'translate3d(' + x + 'px, 0, 0)';
+        whx_pageEl.textContent = '第 ' + (whx_index + 1) + '/' + whx_total + ' 张';
+
+        var dots = whx_dotsEl.children;
+        for (var i = 0; i < dots.length; i++) {
+          dots[i].className = i === whx_index ? 'is-on' : '';
+        }
+      }
+
+      /* 显示边界或操作提示，1.5 秒后自动隐藏 */
+      function whx_showToast(text) {
+        whx_toastEl.textContent = text;
+        whx_toastEl.classList.add('is-show');
+        clearTimeout(whx_toastTimer);
+        whx_toastTimer = setTimeout(function () {
+          whx_toastEl.classList.remove('is-show');
+        }, 1500);
+      }
+
+      /* 根据横向位移切换卡片：先查 300ms 冷却，再查 40px 阈值 */
+      function whx_commitSwipe(dx) {
+        var now = performance.now();
+
+        if (now - whx_lastSwitchAt < 300) {
+          whx_renderSwipe(true, 0);
+          return;
+        }
+
+        if (Math.abs(dx) < 40) {
+          whx_renderSwipe(true, 0);
+          return;
+        }
+
+        if (dx < 0) {
+          if (whx_index >= whx_total - 1) {
+            whx_renderSwipe(true, 0);
+            whx_showToast('已经是最后一张');
+            return;
+          }
+          whx_index++;
+        } else {
+          if (whx_index <= 0) {
+            whx_renderSwipe(true, 0);
+            whx_showToast('已经是第一张');
+            return;
+          }
+          whx_index--;
+        }
+
+        whx_lastSwitchAt = now;
+        whx_renderSwipe(true, 0);
+      }
+
+      /* 记录触点起点；双指或冷却期内则忽略本次手势 */
+      function whx_swipeStart(e) {
+        if (e.touches.length > 1) {
+          whx_ignoreSwipe = true;
+          return;
+        }
+        whx_swipeStartX = e.touches[0].clientX;
+        whx_swipeStartY = e.touches[0].clientY;
+        whx_dragging = false;
+        whx_ignoreSwipe = performance.now() - whx_lastSwitchAt < 300;
+      }
+
+      /* 横向拖动时实时跟手，边界处加阻尼 */
+      function whx_swipeMove(e) {
+        if (whx_ignoreSwipe) {
+          return;
+        }
+
+        var touch = e.touches[0];
+        if (!touch) {
+          return;
+        }
+
+        var dx = touch.clientX - whx_swipeStartX;
+        var dy = touch.clientY - whx_swipeStartY;
+
+        if (!whx_dragging) {
+          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+            whx_dragging = true;
+          } else {
+            return;
+          }
+        }
+
+        if ((whx_index === 0 && dx > 0) || (whx_index === whx_total - 1 && dx < 0)) {
+          dx *= 0.3;
+        }
+
+        whx_renderSwipe(false, dx);
+      }
+
+      /* 手指抬起：横向位移超过 40px 才切换，否则回弹 */
+      function whx_swipeEnd(e) {
+        if (!whx_dragging) {
+          whx_ignoreSwipe = false;
+          return;
+        }
+
+        var touch = e.changedTouches[0];
+        var dx = touch.clientX - whx_swipeStartX;
+        var dy = touch.clientY - whx_swipeStartY;
+        whx_dragging = false;
+        whx_ignoreSwipe = false;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+          whx_commitSwipe(dx);
+        } else {
+          whx_renderSwipe(true, 0);
+        }
+      }
+
+      /* 手势被系统打断时收回轨道 */
+      function whx_swipeCancel() {
+        whx_dragging = false;
+        whx_ignoreSwipe = false;
+        whx_renderSwipe(true, 0);
+      }
+
+      /* 桌面预览用的上一道 / 下一道按钮，同样受 300ms 冷却保护 */
+      function whx_stepSwipe(dir) {
+        if (performance.now() - whx_lastSwitchAt < 300) {
+          return;
+        }
+
+        var next = whx_index + dir;
+        if (next < 0) {
+          whx_showToast('已经是第一张');
+          return;
+        }
+        if (next >= whx_total) {
+          whx_showToast('已经是最后一张');
+          return;
+        }
+
+        whx_index = next;
+        whx_lastSwitchAt = performance.now();
+        whx_renderSwipe(true, 0);
+      }
+
+      /* 初始化任务二手势卡片：绑定触摸与按钮事件 */
+      function whx_initSwipe() {
+        whx_renderSwipe(false, 0);
+
+        whx_swipeEl.addEventListener('touchstart', whx_swipeStart, { passive: true });
+        whx_swipeEl.addEventListener('touchmove', whx_swipeMove, { passive: true });
+        whx_swipeEl.addEventListener('touchend', whx_swipeEnd, { passive: true });
+        whx_swipeEl.addEventListener('touchcancel', whx_swipeCancel, { passive: true });
+
+        document.getElementById('whxPrev').addEventListener('click', function () {
+          whx_stepSwipe(-1);
+        });
+        document.getElementById('whxNext').addEventListener('click', function () {
+          whx_stepSwipe(1);
+        });
+
+        window.addEventListener('resize', function () {
+          whx_renderSwipe(false, 0);
+        });
+      }
+
+      /* 把位移夹紧在图片边界内；1× 时强制归零 */
+      function whx_clampZoom(tx, ty) {
+        if (whx_scale <= 1.001) {
+          return { tx: 0, ty: 0 };
+        }
+
+        var rect = whx_zoomEl.getBoundingClientRect();
+        var minX = rect.width - rect.width * whx_scale;
+        var minY = rect.height - rect.height * whx_scale;
+
+        return {
+          tx: Math.min(0, Math.max(minX, tx)),
+          ty: Math.min(0, Math.max(minY, ty))
+        };
+      }
+
+      /* 应用缩放与位移，并刷新比例指示器 */
+      function whx_applyZoom(animate) {
+        whx_zoomImg.style.transition = animate ? 'transform 0.25s ease' : 'none';
+        whx_zoomImg.style.transform = 'translate3d(' + whx_tx + 'px, ' + whx_ty + 'px, 0) scale(' + whx_scale + ')';
+        whx_zoomBadge.textContent = whx_scale.toFixed(2) + '×';
+      }
+
+      /* 以指定中心点缩放到目标比例，保证该点不跳 */
+      function whx_setZoom(nextScale, centerX, centerY) {
+        var rect = whx_zoomEl.getBoundingClientRect();
+        if (typeof centerX !== 'number') {
+          centerX = rect.width / 2;
+        }
+        if (typeof centerY !== 'number') {
+          centerY = rect.height / 2;
+        }
+
+        nextScale = Math.min(4, Math.max(1, nextScale));
+
+        var imgX = (centerX - whx_tx) / whx_scale;
+        var imgY = (centerY - whx_ty) / whx_scale;
+
+        whx_scale = nextScale;
+
+        var clamped = whx_clampZoom(centerX - imgX * nextScale, centerY - imgY * nextScale);
+        whx_tx = clamped.tx;
+        whx_ty = clamped.ty;
+        whx_applyZoom(true);
+      }
+
+      /* 手势结束后回弹到合法范围，接近 1× 时自动居中 */
+      function whx_settleZoom() {
+        if (whx_scale < 1.02) {
+          whx_scale = 1;
+          whx_tx = 0;
+          whx_ty = 0;
+        } else {
+          var clamped = whx_clampZoom(whx_tx, whx_ty);
+          whx_tx = clamped.tx;
+          whx_ty = clamped.ty;
+        }
+        whx_applyZoom(true);
+      }
+
+      /* 双击切换：1× ↔ 2×，以双击点为缩放中心 */
+      function whx_toggleZoomAt(pointX, pointY) {
+        if (whx_scale > 1.05) {
+          whx_scale = 1;
+          whx_tx = 0;
+          whx_ty = 0;
+          whx_applyZoom(true);
+          return;
+        }
+        whx_setZoom(2, pointX, pointY);
+      }
+
+      /* 触摸开始：双指进入缩放，单指进入拖动并记录点击候选 */
+      function whx_zoomStart(e) {
+        whx_zoomHint.classList.add('is-hidden');
+
+        if (e.touches.length >= 2) {
+          var t1 = e.touches[0];
+          var t2 = e.touches[1];
+          var rect = whx_zoomEl.getBoundingClientRect();
+          var midX = (t1.clientX + t2.clientX) / 2 - rect.left;
+          var midY = (t1.clientY + t2.clientY) / 2 - rect.top;
+
+          whx_zoomMode = 'pinch';
+          whx_pinchStartDist = Math.max(1, Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY));
+          whx_pinchStartScale = whx_scale;
+          whx_pinchAnchorX = (midX - whx_tx) / whx_scale;
+          whx_pinchAnchorY = (midY - whx_ty) / whx_scale;
+          whx_tapStart = null;
+          return;
+        }
+
+        var touch = e.touches[0];
+        whx_zoomMode = 'pan';
+        whx_panStartX = touch.clientX;
+        whx_panStartY = touch.clientY;
+        whx_panStartTx = whx_tx;
+        whx_panStartTy = whx_ty;
+
+        var rectSingle = whx_zoomEl.getBoundingClientRect();
+        whx_tapStart = {
+          x: touch.clientX - rectSingle.left,
+          y: touch.clientY - rectSingle.top,
+          time: performance.now(),
+          moved: false
+        };
+      }
+
+      /* 触摸移动：双指按间距比例缩放，单指拖动图片 */
+      function whx_zoomMove(e) {
+        e.preventDefault();
+
+        if (whx_zoomMode === 'pinch' && e.touches.length >= 2) {
+          var t1 = e.touches[0];
+          var t2 = e.touches[1];
+          var rect = whx_zoomEl.getBoundingClientRect();
+          var midX = (t1.clientX + t2.clientX) / 2 - rect.left;
+          var midY = (t1.clientY + t2.clientY) / 2 - rect.top;
+          var dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+          var nextScale = whx_pinchStartScale * (dist / whx_pinchStartDist);
+          nextScale = Math.min(4, Math.max(1, nextScale));
+
+          whx_scale = nextScale;
+          var clampedPinch = whx_clampZoom(
+            midX - whx_pinchAnchorX * nextScale,
+            midY - whx_pinchAnchorY * nextScale
+          );
+          whx_tx = clampedPinch.tx;
+          whx_ty = clampedPinch.ty;
+          whx_applyZoom(false);
+          return;
+        }
+
+        if (whx_zoomMode === 'pan' && e.touches.length === 1) {
+          if (whx_tapStart) {
+            var rectPan = whx_zoomEl.getBoundingClientRect();
+            var px = e.touches[0].clientX - rectPan.left;
+            var py = e.touches[0].clientY - rectPan.top;
+            if (Math.hypot(px - whx_tapStart.x, py - whx_tapStart.y) > 8) {
+              whx_tapStart.moved = true;
+            }
+          }
+
+          if (whx_scale <= 1.001) {
+            return;
+          }
+
+          var clampedPan = whx_clampZoom(
+            whx_panStartTx + (e.touches[0].clientX - whx_panStartX),
+            whx_panStartTy + (e.touches[0].clientY - whx_panStartY)
+          );
+          whx_tx = clampedPan.tx;
+          whx_ty = clampedPan.ty;
+          whx_applyZoom(false);
+        }
+      }
+
+      /* 触摸结束：双指剩一指时转为拖动，否则结算并判定双击 */
+      function whx_zoomEnd(e) {
+        if (whx_zoomMode === 'pinch') {
+          if (e.touches.length === 1) {
+            whx_zoomMode = 'pan';
+            whx_panStartX = e.touches[0].clientX;
+            whx_panStartY = e.touches[0].clientY;
+            whx_panStartTx = whx_tx;
+            whx_panStartTy = whx_ty;
+            whx_tapStart = null;
+            return;
+          }
+          whx_zoomMode = 'none';
+          whx_settleZoom();
+          return;
+        }
+
+        if (e.touches.length > 0) {
+          return;
+        }
+
+        var now = performance.now();
+        if (whx_tapStart && !whx_tapStart.moved && now - whx_tapStart.time < 250) {
+          if (now - whx_lastTapAt < 300) {
+            whx_lastTapAt = 0;
+            whx_toggleZoomAt(whx_tapStart.x, whx_tapStart.y);
+          } else {
+            whx_lastTapAt = now;
+          }
+        }
+
+        whx_tapStart = null;
+        whx_zoomMode = 'none';
+        whx_settleZoom();
+      }
+
+      /* 手势被系统打断：放弃当前手势并回弹 */
+      function whx_zoomCancel() {
+        whx_zoomMode = 'none';
+        whx_tapStart = null;
+        whx_settleZoom();
+      }
+
+      /* 屏幕旋转或窗口变化：保留比例，只重新夹紧位移 */
+      function whx_zoomResize() {
+        var clamped = whx_clampZoom(whx_tx, whx_ty);
+        whx_tx = clamped.tx;
+        whx_ty = clamped.ty;
+        whx_applyZoom(false);
+      }
+
+      /* 初始化任务三查看器：绑定触摸、比例按钮与旋转事件 */
+      function whx_initZoom() {
+        whx_zoomEl.addEventListener('touchstart', whx_zoomStart, { passive: true });
+        whx_zoomEl.addEventListener('touchmove', whx_zoomMove, { passive: false });
+        whx_zoomEl.addEventListener('touchend', whx_zoomEnd, { passive: true });
+        whx_zoomEl.addEventListener('touchcancel', whx_zoomCancel, { passive: true });
+
+        var buttons = document.querySelectorAll('.whx_zoom-actions [data-zoom]');
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].addEventListener('click', function () {
+            whx_setZoom(parseFloat(this.getAttribute('data-zoom')));
+          });
+        }
+
+        window.addEventListener('resize', whx_zoomResize);
+        window.addEventListener('orientationchange', function () {
+          setTimeout(whx_zoomResize, 180);
+        });
+
+        whx_applyZoom(false);
+      }
+
+      /* 更新传感器状态胶囊的文案与配色 */
+      function whx_setSensorState(text, kind) {
+        whx_sensorState.textContent = text;
+        whx_sensorState.classList.remove('is-active', 'is-warn');
+        if (kind === 'active') {
+          whx_sensorState.classList.add('is-active');
+        }
+        if (kind === 'warn') {
+          whx_sensorState.classList.add('is-warn');
+        }
+      }
+
+      /* 随机抽一道菜，避免连续两次相同，并播放弹出动画 */
+      function whx_pickDish(fromShake) {
+        var index = whx_lastDish;
+        if (whx_dishes.length > 1) {
+          while (index === whx_lastDish) {
+            index = Math.floor(Math.random() * whx_dishes.length);
+          }
+        } else {
+          index = 0;
+        }
+
+        whx_lastDish = index;
+        whx_sensorDish.textContent = whx_dishes[index].name;
+        whx_sensorDesc.textContent = whx_dishes[index].desc;
+
+        whx_sensorResult.classList.remove('is-pop');
+        void whx_sensorResult.offsetWidth;
+        whx_sensorResult.classList.add('is-pop');
+
+        if (fromShake) {
+          whx_sensorTip.textContent = '检测到摇动，已抽到：' + whx_dishes[index].name + '。';
+        }
+      }
+
+      /* 监听 devicemotion，用合成加速度判断摇动并执行 1.5s 冷却 */
+      function whx_onMotion(event) {
+        var acc = event.accelerationIncludingGravity;
+        if (!acc || typeof acc.x !== 'number') {
+          return;
+        }
+
+        var firstData = !whx_motionSeen;
+        whx_motionSeen = true;
+        clearTimeout(whx_motionTimer);
+
+        if (firstData) {
+          whx_setSensorState('传感器已开启', 'active');
+          whx_sensorTip.textContent = '传感器工作正常，摇一摇手机试试。';
+        }
+
+        var x = acc.x || 0;
+        var y = acc.y || 0;
+        var z = acc.z || 0;
+        var magnitude = Math.sqrt(x * x + y * y + z * z);
+        whx_sensorLive.textContent = '合成加速度 ' + magnitude.toFixed(1) + ' · 阈值 18 · 冷却 1.5s';
+
+        var now = performance.now();
+        if (magnitude < 18 || now < whx_cooldownUntil) {
+          return;
+        }
+
+        whx_cooldownUntil = now + 1500;
+        whx_pickDish(true);
+        whx_setSensorState('冷却中', 'active');
+
+        clearTimeout(whx_cooldownTimer);
+        whx_cooldownTimer = setTimeout(function () {
+          whx_setSensorState('传感器已开启', 'active');
+        }, 1500);
+      }
+
+      /* 开始监听加速度，1.8s 内无有效数据则判定设备不支持 */
+      function whx_startMotion() {
+        if (whx_motionBound) {
+          return;
+        }
+        whx_motionBound = true;
+        window.addEventListener('devicemotion', whx_onMotion, false);
+
+        clearTimeout(whx_motionTimer);
+        whx_motionTimer = setTimeout(function () {
+          if (whx_motionSeen) {
+            return;
+          }
+          whx_setSensorState('当前设备不支持', 'warn');
+          whx_sensorLive.textContent = '未收到 devicemotion 数据 · 可点“点我抽一次”';
+          whx_sensorTip.textContent = '当前设备不支持，请用手机打开；也可以点“点我抽一次”直接抽菜谱。';
+        }, 1800);
+      }
+
+      /* iOS 权限按钮：必须在用户手势中调用 requestPermission */
+      function whx_requestMotionPermission() {
+        if (!whx_sensorPerm) {
+          return;
+        }
+
+        whx_sensorPerm.hidden = true;
+        whx_setSensorState('申请权限…', 'active');
+
+        DeviceMotionEvent.requestPermission().then(function (result) {
+          if (result === 'granted') {
+            whx_sensorTip.textContent = '传感器权限已开启，摇一摇手机试试。';
+            whx_setSensorState('正在监听…', 'active');
+            whx_startMotion();
+          } else {
+            whx_setSensorState('权限未开启', 'warn');
+            whx_sensorTip.textContent = '传感器权限未开启，可以点“点我抽一次”直接抽菜谱。';
+          }
+        }).catch(function () {
+          whx_setSensorState('权限申请失败', 'warn');
+          whx_sensorTip.textContent = '当前设备不支持，请用手机打开；也可以点“点我抽一次”。';
+        });
+      }
+
+      /* 初始化任务四：绑定降级按钮，判断传感器与 iOS 权限 */
+      function whx_initSensor() {
+        document.getElementById('whxSensorPick').addEventListener('click', function () {
+          whx_pickDish(false);
+        });
+
+        if (whx_sensorPerm) {
+          whx_sensorPerm.addEventListener('click', whx_requestMotionPermission);
+        }
+
+        if (typeof window.DeviceMotionEvent === 'undefined') {
+          whx_setSensorState('当前设备不支持', 'warn');
+          whx_sensorLive.textContent = '当前设备不支持 · 可点“点我抽一次”';
+          whx_sensorTip.textContent = '当前设备不支持，请用手机打开；也可以点“点我抽一次”直接抽菜谱。';
+          return;
+        }
+
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+          whx_sensorPerm.hidden = false;
+          whx_setSensorState('需要开启权限', 'warn');
+          whx_sensorTip.textContent = 'iOS 需要点击“开启传感器权限”后才能读取加速度。';
+          return;
+        }
+
+        whx_setSensorState('正在监听…', 'active');
+        whx_startMotion();
+      }
+
+      /* 绑定一个视频位：本地选择后临时预览，不会上传 */
+      function whx_bindVideoPicker(videoId, emptyId, inputId) {
+        var video = document.getElementById(videoId);
+        var empty = document.getElementById(emptyId);
+        var input = document.getElementById(inputId);
+        var objectURL = null;
+
+        if (!video || !empty || !input) {
+          return;
+        }
+
+        input.addEventListener('change', function () {
+          var file = input.files && input.files[0];
+          if (!file) {
+            return;
+          }
+
+          if (objectURL) {
+            URL.revokeObjectURL(objectURL);
+          }
+          objectURL = URL.createObjectURL(file);
+          video.src = objectURL;
+          video.hidden = false;
+          empty.hidden = true;
+          video.load();
+        });
+      }
+
+      /* 初始化两个手机测试视频位 */
+      function whx_initVideos() {
+        whx_bindVideoPicker('whxZoomVideo', 'whxVideoEmpty', 'whxVideoFile');
+        whx_bindVideoPicker('whxSensorVideo', 'whxSensorVideoEmpty', 'whxSensorVideoFile');
+      }
+
+      /* 页面初始化：绑定事件、刷新计数、绘制空轨迹、绑定按钮 */
+      function whx_init() {
+        whx_bindEvents();
+        whx_updateCounters();
+        whx_drawTrace();
+        whx_initSwipe();
+        whx_initZoom();
+        whx_initVideos();
+        whx_initSensor();
+        whx_setState('等待触摸', false);
+
+        document.getElementById('whxClearLog').addEventListener('click', whx_clearLog);
+        document.getElementById('whxClearTrace').addEventListener('click', function () {
+          whx_points = [];
+          whx_drawTrace();
+          whx_tip.textContent = '轨迹已清空，再拖动一次即可重新绘制。';
+        });
+
+        window.addEventListener('resize', whx_drawTrace);
+      }
+
+      whx_init();
+    })();
+  </script>
+</body>
+</html>
