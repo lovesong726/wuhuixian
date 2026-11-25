@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<!-- 作者：吴慧贤 | 学号：24002120213 | 建立时间：2026-11-25 | 使用大模型：DeepSeek-V4.1-Flash | 功能名称：各界面操作展示页（语音识别、图像识别、知识库问答、在线客服四张操作截图） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#161226">
+  <title>各界面操作展示 | 吴慧贤</title>
+  <style>
+    :root {
+      --whx_bg: #f4f4fa;
+      --whx_card: #ffffff;
+      --whx_ink: #1b1a2a;
+      --whx_muted: #6d6f88;
+      --whx_line: #e3e4ef;
+      --whx_accent: #6557d2;
+      --whx_accent-soft: #efedff;
+      --whx_shadow: 0 16px 40px rgba(31, 27, 70, 0.08);
+      --whx_font: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+      --whx_mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background: var(--whx_bg);
+      color: var(--whx_ink);
+      font-family: var(--whx_font);
+      line-height: 1.7;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    h1, h2, h3, p, figure {
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    code {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--whx_accent-soft);
+      color: #4b3fb5;
+      font-family: var(--whx_mono);
+      font-size: 0.9em;
+    }
+
+    /* ===== 顶部 ===== */
+    .whx_hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 18px 30px;
+      border-radius: 0 0 26px 26px;
+      background:
+        radial-gradient(circle at 84% 10%, rgba(139, 127, 240, 0.35), transparent 42%),
+        radial-gradient(circle at 8% 92%, rgba(46, 190, 150, 0.18), transparent 42%),
+        linear-gradient(140deg, #161226 0%, #221a3f 58%, #2a2050 100%);
+      color: #fff;
+    }
+
+    .whx_hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .whx_kicker {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+    }
+
+    .whx_hero h1 {
+      margin: 12px 0;
+      font-size: clamp(28px, 7vw, 42px);
+      line-height: 1.25;
+      letter-spacing: 1px;
+    }
+
+    .whx_hero-desc {
+      max-width: 660px;
+      font-size: 13.5px;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    .whx_hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .whx_hero-tag {
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    /* ===== 主体 ===== */
+    .whx_main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .whx_show {
+      margin-bottom: 20px;
+      padding: 16px;
+      border: 1px solid var(--whx_line);
+      border-radius: 22px;
+      background: var(--whx_card);
+      box-shadow: var(--whx_shadow);
+    }
+
+    .whx_show-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 13px;
+    }
+
+    .whx_num {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6c5ce7, #8f7bff);
+      color: #fff;
+      font-family: var(--whx_mono);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 34px;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(108, 92, 231, 0.25);
+    }
+
+    .whx_show-head h2 {
+      font-size: 17px;
+      letter-spacing: 0.5px;
+    }
+
+    .whx_tag {
+      margin-left: auto;
+      padding: 4px 10px;
+      border: 1px solid #d9d3ff;
+      border-radius: 999px;
+      background: var(--whx_accent-soft);
+      color: var(--whx_accent);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* 截图区域 */
+    .whx_shot {
+      display: block;
+      overflow: hidden;
+      border: 1px solid #dcdced;
+      border-radius: 14px;
+      background: #121020;
+    }
+
+    .whx_shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .whx_shot-tip {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 7px;
+      color: var(--whx_muted);
+      font-size: 11px;
+    }
+
+    .whx_shot-tip b {
+      color: var(--whx_accent);
+    }
+
+    .whx_points {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: #464a63;
+      font-size: 12.5px;
+      line-height: 1.9;
+    }
+
+    .whx_points li {
+      margin-bottom: 2px;
+    }
+
+    /* ===== 页脚 ===== */
+    .whx_footer {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 6px 16px 46px;
+      color: var(--whx_muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .whx_footer a {
+      color: var(--whx_accent);
+      font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+      .whx_hero {
+        padding: 28px 16px 26px;
+      }
+
+      .whx_tag {
+        margin-left: 0;
+      }
+
+      .whx_show {
+        padding: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="whx_hero">
+    <div class="whx_hero-inner">
+      <p class="whx_kicker">Advanced Web Design · Interface Showcase</p>
+      <h1>各界面<br>操作展示</h1>
+      <p class="whx_hero-desc">四张实际运行截图，按操作顺序展示语音识别、图像识别、知识库智能问答与美食街在线客服四个界面的输入、处理结果与关键参数。点击任意截图可查看原图。</p>
+      <div class="whx_hero-tags">
+        <span class="whx_hero-tag">语音识别</span>
+        <span class="whx_hero-tag">图像识别</span>
+        <span class="whx_hero-tag">知识库问答</span>
+        <span class="whx_hero-tag">在线客服</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="whx_main">
+    <!-- 界面一：语音识别 -->
+    <figure class="whx_show">
+      <div class="whx_show-head">
+        <span class="whx_num">01</span>
+        <h2>语音识别界面</h2>
+        <span class="whx_tag">语音 · speech.html</span>
+      </div>
+      <a class="whx_shot" href="image/屏幕截图 2026-11-25 144125.png" target="_blank" rel="noopener">
+        <img src="image/屏幕截图 2026-11-25 144125.png" alt="语音识别界面：点击开始识别后输出识别文字">
+      </a>
+      <p class="whx_shot-tip">点击截图 <b>查看原图</b></p>
+      <ul class="whx_points">
+        <li>顶部操作区提供「使用示例音频」「重新选择」「开始识别」三个按钮，选择音频后点击开始识别。</li>
+        <li>识别完成后显示耗时 1.4 秒，输出文字为“hello, world这里是阿里巴巴语音实验室。”</li>
+        <li>结果区标注模型 FunAudioLLM/SenseVoiceSmall、音频时长 4 秒、计费类型 duration。</li>
+      </ul>
+    </figure>
+
+    <!-- 界面二：图像识别 -->
+    <figure class="whx_show">
+      <div class="whx_show-head">
+        <span class="whx_num">02</span>
+        <h2>图像识别界面</h2>
+        <span class="whx_tag">视觉 · image_vision.html</span>
+      </div>
+      <a class="whx_shot" href="image/屏幕截图 2026-11-25 144510.png" target="_blank" rel="noopener">
+        <img src="image/屏幕截图 2026-11-25 144510.png" alt="图像识别界面：上传图片后输出画面描述">
+      </a>
+      <p class="whx_shot-tip">点击截图 <b>查看原图</b></p>
+      <ul class="whx_points">
+        <li>上传图片后，右侧画面直接给出该图的详细描述，包括服装配饰、发型妆容、背景文字与水印信息。</li>
+        <li>结果区标注模型 Qwen/Qwen3-VL-8B-Instruct，输入 2444 tokens、输出 513 tokens、合计 2957 tokens。</li>
+        <li>描述按“关键细节”分条组织，并给出整体总结，便于核对模型识别是否准确。</li>
+      </ul>
+    </figure>
+
+    <!-- 界面三：知识库智能问答 -->
+    <figure class="whx_show">
+      <div class="whx_show-head">
+        <span class="whx_num">03</span>
+        <h2>知识库智能问答界面</h2>
+        <span class="whx_tag">检索 · knowledge.html</span>
+      </div>
+      <a class="whx_shot" href="image/屏幕截图 2026-11-25 144743.png" target="_blank" rel="noopener">
+        <img src="image/屏幕截图 2026-11-25 144743.png" alt="知识库智能问答界面：提问后给出答案与来源片段">
+      </a>
+      <p class="whx_shot-tip">点击截图 <b>查看原图</b></p>
+      <ul class="whx_points">
+        <li>输入问题“寻味荷兰什么学科”后点击「提问」，系统先检索知识片段，再由大模型组织答案。</li>
+        <li>答案说明知识库暂无该学科信息，并给出更准确的提问示例，同时补充项目所属学科为工学、管理学。</li>
+        <li>答案下方列出 4 条来源片段及相关度：0.5353、0.4155、0.2445、0.2379，来源包含 PDF 与 PPTX 文档。</li>
+      </ul>
+    </figure>
+
+    <!-- 界面四：在线客服 -->
+    <figure class="whx_show">
+      <div class="whx_show-head">
+        <span class="whx_num">04</span>
+        <h2>中华美食街在线客服界面</h2>
+        <span class="whx_tag">对话 · ai_chat.html</span>
+      </div>
+      <a class="whx_shot" href="image/屏幕截图 2026-11-25 144832.png" target="_blank" rel="noopener">
+        <img src="image/屏幕截图 2026-11-25 144832.png" alt="中华美食街在线客服界面：提问招牌菜并得到回复">
+      </a>
+      <p class="whx_shot-tip">点击截图 <b>查看原图</b></p>
+      <ul class="whx_points">
+        <li>对话区上方显示当前服务商「硅基流动」，模型 Qwen/Qwen2.5-7B-Instruct，并标注“已连接”。</li>
+        <li>提问“店里的招牌菜有哪些？”后，客服回复兰州牛肉面、西安肉夹馍、重庆酸辣粉、长沙臭豆腐、成都串串香和北京烤鸭卷。</li>
+        <li>回复中说明销量最高的是兰州牛肉面和西安肉夹馍；底部输入框支持 Enter 发送、Shift + Enter 换行。</li>
+      </ul>
+    </figure>
+  </main>
+
+  <footer class="whx_footer">
+    <p>吴慧贤 · 24002120213 · 高级网页设计课堂实践</p>
+    <p><a href="index.html">返回课程目录</a></p>
+  </footer>
+</body>
+</html>
